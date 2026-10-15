@@ -10,7 +10,11 @@ interface SessionEntry {
   timestamp: number
 }
 
-export default function HistoryScreen() {
+interface HistoryScreenProps {
+  onBack: () => void
+}
+
+export default function HistoryScreen({ onBack }: HistoryScreenProps) {
   const [history, setHistory] = useState<SessionEntry[]>([])
 
   useEffect(() => {
@@ -34,15 +38,20 @@ export default function HistoryScreen() {
           <p className="screen-eyebrow">PROGRESS TRACKER</p>
           <h1 className="screen-title">Session History</h1>
         </div>
-        {history.length > 0 && (
-          <button
-            className="btn-ghost"
-            type="button"
-            onClick={clearHistory}
-          >
-            Clear All
+        <div className="screen-actions">
+          <button className="btn-ghost" type="button" onClick={onBack}>
+            Back
           </button>
-        )}
+          {history.length > 0 && (
+            <button
+              className="btn-ghost"
+              type="button"
+              onClick={clearHistory}
+            >
+              Clear All
+            </button>
+          )}
+        </div>
       </header>
 
       <Disclaimer />

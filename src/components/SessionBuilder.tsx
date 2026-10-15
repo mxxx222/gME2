@@ -1,9 +1,14 @@
 import { useState } from 'react'
 
+interface SessionBuilderProps {
+  onStart: () => void
+  onViewHistory: () => void
+}
+
 const DEFAULT_AROUSAL = [6, 4, 7]
 const DEFAULT_DURATION = [300, 180, 600] // 5min, 3min, 10min
 
-export default function SessionBuilder() {
+export default function SessionBuilder({ onStart, onViewHistory }: SessionBuilderProps) {
   const [roles, setRoles] = useState<'controller' | 'receiver'>('controller')
   const [waves, setWaves] = useState([
     { arousal: DEFAULT_AROUSAL[0], duration: DEFAULT_DURATION[0] },
@@ -14,6 +19,11 @@ export default function SessionBuilder() {
   const [showTips, setShowTips] = useState(false)
 
   const totalDuration = waves.reduce((sum, w) => sum + w.duration, 0)
+  const avgArousal = waves.reduce((sum, w) => sum + w.arousal, 0) / waves.length
+
+  const handleStart = () => {
+    onStart()
+  }
 
   return (
     <div className="screen">
@@ -26,7 +36,7 @@ export default function SessionBuilder() {
           <button
             className="btn-primary"
             type="button"
-            onClick={() => alert('Starting session...')}
+            onClick={handleStart}
           >
             Start Session
           </button>
@@ -75,7 +85,7 @@ export default function SessionBuilder() {
           <div className="form-section">
             <h3>Three-Wave Protocol</h3>
             <p className="form-hint">
-              The 3-wave edging protocol: Warm-up → Build → Peak &amp; Recovery
+              The 3-wave edging protocol: Warm-up → Build → Peak & Recovery
             </p>
 
             {waves.map((wave, index) => (
@@ -163,7 +173,7 @@ export default function SessionBuilder() {
             <div className="stat">
               <span className="stat-label">Avg Arousal</span>
               <span className="stat-value">
-                {(waves.reduce((sum, w) => sum + w.arousal, 0) / waves.length).toFixed(1)} / 10
+                {avgArousal.toFixed(1)} / 10
               </span>
             </div>
           </div>
@@ -174,6 +184,15 @@ export default function SessionBuilder() {
             onClick={() => setShowTips((s) => !s)}
           >
             {showTips ? 'Hide Tips' : 'Show Tips'}
+          </button>
+
+          <button
+            className="btn-ghost"
+            type="button"
+            onClick={onViewHistory}
+            style={{ marginTop: '12px' }}
+          >
+            View History
           </button>
         </aside>
       </div>

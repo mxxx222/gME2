@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
-interface ShareLinkProps {
+interface SessionTimerProps {
   config: {
     name: string
     arousal: number
@@ -10,39 +10,66 @@ interface ShareLinkProps {
   onOpen: () => void
 }
 
-export default function SessionTimer({ config, onOpen }: ShareLinkProps) {
+export default function SessionTimer({ config, onOpen }: SessionTimerProps) {
   const [waveIndex, setWaveIndex] = useState(0)
   const [totalElapsed, setTotalElapsed] = useState(0)
   const [running, setRunning] = useState(false)
+  const rafId = useRef<number | null>(null)
+  const lastTime = useRef<number>(0)
+
+  const waveTargets = [6, 7, 8]
+  const waveDurations = [
+    Math.floor(config.duration * 0.3),
+    Math.floor(config.duration * 0.2),
+    Math.floor(config.duration * 0.5),
+  ]
 
   const currentWave = {
     name: `Wave ${waveIndex + 1}`,
-    targetArousal: Math.max(1, Math.min(10, Math.round(6 + waveIndex * 1.5))),
-    remaining: config.duration || 300000,
+    targetArousal: waveTargets[waveIndex] || 6,
+    remaining: waveDurations[waveIndex] || 60000,
   }
 
-  const totalDuration = config.duration || 300000
+  const totalDuration = config.duration
 
   useEffect(() => {
     if (!running) return
 
-    const id = setInterval(() => {
+    const tick = (timestamp: number) => {
+      if (lastTime.current === 0) {
+        lastTime.current = timestamp
+      }
+      const delta = (timestamp - lastTime.current) / 1000
+      lastTime.current = timestamp
+
       setTotalElapsed((t) => {
-        const newT = t + 1000
-        if (newT >= totalDuration && totalDuration > 0) {
-          setRunning(false)
-          setTotalElapsed(totalDuration)
+        const newT = t + delta * 1000
+        if (newT >= currentWave.remaining && currentWave.remaining > 0) {
           if (waveIndex < 2) {
             setWaveIndex((i) => i + 1)
             setTotalElapsed(0)
+            lastTime.current = 0
+          } else {
+            setRunning(false)
+            setTotalElapsed(totalDuration)
           }
         }
-        return newT
+        return Math.min(newT, totalDuration)
       })
-    }, 1000)
 
-    return () => clearInterval(id)
-  }, [running, totalDuration, waveIndex])
+      rafId.current = requestAnimationFrame(tick)
+    }
+
+    lastTime.current = 0
+    rafId.current = requestAnimationFrame(tick)
+
+    return () => {
+      if (rafId.current) {
+        cancelAnimationFrame(rafId.current)
+        rafId.current = null
+      }
+    }
+  }, [running, totalDuration, waveIndex, currentWave.remaining])
 
   const shareHash = btoa(JSON.stringify(config))
 
@@ -160,7 +187,7 @@ export default function SessionTimer({ config, onOpen }: ShareLinkProps) {
             placeholder="Copy link"
           />
           <button className="btn-primary small" type="button" onClick={onOpen}>
-            Open Share
+            Back to Builder
           </button>
         </div>
         <p className="share-hint">

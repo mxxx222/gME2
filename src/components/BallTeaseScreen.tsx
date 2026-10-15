@@ -2,6 +2,10 @@ import { useState } from 'react'
 import HandSVG from './HandSVG'
 import Disclaimer from './Disclaimer'
 
+interface BallTeaseScreenProps {
+  onStartSession: () => void
+}
+
 const PRESSURE_LEVELS = [
   { value: 0.1, label: 'Light', description: 'Gentle teasing touch' },
   { value: 0.3, label: 'Medium', description: 'Firm but controlled' },
@@ -10,7 +14,7 @@ const PRESSURE_LEVELS = [
   { value: 0.9, label: 'Maximum', description: 'Full grip intensity' },
 ]
 
-export default function BallTeaseScreen() {
+export default function BallTeaseScreen({ onStartSession }: BallTeaseScreenProps) {
   const [pressure, setPressure] = useState(0.3)
   const [timer, setTimer] = useState(0)
   const [running, setRunning] = useState(false)
@@ -112,6 +116,10 @@ export default function BallTeaseScreen() {
                 ))}
               </div>
             </div>
+
+            <button className="btn-primary full-width" type="button" onClick={onStartSession}>
+              Continue to Session Builder
+            </button>
           </div>
         </div>
       </div>
