@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
+import ChallengeHub from './components/ChallengeHub'
 import './App.css'
 
-type Screen = 'onboarding' | 'solo'
+type Screen = 'onboarding' | 'solo' | 'challenges'
 type TimerStatus = 'idle' | 'running' | 'paused' | 'complete'
 
 const soloCards = [
@@ -57,6 +58,7 @@ function App() {
   const [reflection, setReflection] = useState('')
   const [notice, setNotice] = useState('')
   const dialogRef = useRef<HTMLElement | null>(null)
+  const challengeButtonRef = useRef<HTMLButtonElement | null>(null)
 
   const selectedCard = soloCards.find((card) => card.id === selectedCardId) ?? soloCards[0]
 
@@ -69,6 +71,29 @@ function App() {
     pauseActiveTimers()
     setScreen('onboarding')
     setStage(2)
+  }
+
+  function openChallenges() {
+    pauseActiveTimers()
+    if (!ageConfirmed) {
+      setScreen('onboarding')
+      setStage(1)
+      setNotice('Please confirm that you are 18 or older before opening a challenge.')
+      return
+    }
+    if (!privacyAcknowledged) {
+      setScreen('onboarding')
+      setStage(2)
+      setNotice('Review the privacy details before opening a challenge.')
+      return
+    }
+    setScreen('challenges')
+    setNotice('')
+  }
+
+  function exitChallenges() {
+    setScreen('onboarding')
+    challengeButtonRef.current?.focus()
   }
 
   useEffect(() => {
@@ -213,6 +238,7 @@ function App() {
         </a>
         <div className="topbar-right">
           <span className="topbar-caption">INTIMACY, AT YOUR PACE</span>
+          <button className="topbar-action" ref={challengeButtonRef} type="button" onClick={openChallenges}>Challenges</button>
           <span className="age-chip">18+</span>
         </div>
       </header>
@@ -403,7 +429,7 @@ function App() {
             )}
           </section>
         </>
-      ) : (
+      ) : screen === 'solo' ? (
         <section className="solo-screen" aria-labelledby="solo-heading">
           <div className="solo-heading-row">
             <div><p className="eyebrow"><span /> SOLO SPACE</p><h1 id="solo-heading">A moment, <em>for you.</em></h1></div>
@@ -466,7 +492,9 @@ function App() {
             <button className="button button-quiet" type="button" onClick={() => setShowDeleteDialog(true)}>Privacy &amp; clear choices</button>
           </div>
         </section>
-      )}
+      ) : null}
+
+      <ChallengeHub hidden={screen !== 'challenges'} onExit={exitChallenges} />
 
       {notice && <p className="toast" role="status">{notice}<button type="button" aria-label="Dismiss notification" onClick={() => setNotice('')}>×</button></p>}
 
