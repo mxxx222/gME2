@@ -1,98 +1,141 @@
-import { useState } from 'react'
-import './App.css'
+import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import ConsentGate from './components/ConsentGate'
+import BallTeaseScreen from './components/BallTeaseScreen'
+import SessionBuilder from './components/SessionBuilder'
+import SessionTimer from './components/SessionTimer'
+import HistoryScreen from './components/HistoryScreen'
 
-const chapters = [
-  { number: '01', title: 'The First Signal', detail: 'A message arrives after midnight.', tone: 'violet' },
-  { number: '02', title: 'Glasshouse', detail: 'Someone knows what you did.', tone: 'blue' },
-  { number: '03', title: 'Last Call', detail: 'One final choice changes everything.', tone: 'amber' },
-]
+function getPathname(): string {
+  const h = window.location.hash.startsWith('#')
+    ? window.location.hash.slice(1)
+    : ''
+  if (!h || h === '/' || h === '') return '/'
+  const parts = h.split('/')
+  if (parts.length === 1) return '/' + parts[0]
+  if (parts.length === 2) return '/' + parts[0] + '/' + parts[1]
+  return '/' + parts.slice(0, 3).join('/')
+}
 
-function App() {
-  const [selectedChapter, setSelectedChapter] = useState(chapters[0].number)
-  const [hasStarted, setHasStarted] = useState(false)
+function navigateTo(path: string) {
+  const hash = path === '/' ? '' : `#${path.replace(/^\//, '')}`
+  window.location.hash = hash
+}
+
+function useHashNavigation() {
+  const [currentPath, setCurrentPath] = useState(getPathname())
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      setCurrentPath(getPathname())
+    }
+    window.addEventListener('hashchange', handleHashChange)
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [])
+
+  return currentPath
+}
+
+export default function App() {
+  const [consentGranted, setConsentGranted] = useState(false)
+  const currentPath = useHashNavigation()
+
+  const navigate = (path: string) => {
+    navigateTo(path)
+  }
+
+  const renderScreen = () => {
+    switch (currentPath) {
+      case '/':
+        return (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }} className="screen">
+            <h1 className="screen-title">Edging Tease &amp; Control</h1>
+            <p className="screen-subtitle">Select a technique to begin</p>
+            <div className="screen-actions">
+              <button className="btn-primary" onClick={() => navigate('/technique/ball-tease')}>
+                Ball Tease Grip
+              </button>
+              <button className="btn-ghost" onClick={() => navigate('/session')}>
+                Session Builder
+              </button>
+            </div>
+          </motion.div>
+        )
+      case '/technique/ball-tease':
+        return <BallTeaseScreen />
+      case '/session':
+        return <SessionBuilder />
+      case '/session/timer':
+        return (
+          <SessionTimer
+            config={{ name: 'Shared Session', arousal: 6, duration: 300000, timestamp: Date.now() }}
+            onOpen={() => window.open('', '_blank')}
+          />
+        )
+      case '/history':
+        return <HistoryScreen />
+      default:
+        return (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }} className="screen">
+            <h1 className="screen-title">Edging Tease &amp; Control</h1>
+            <p className="screen-subtitle">Welcome to the app</p>
+          </motion.div>
+        )
+    }
+  }
+
+  if (!consentGranted) {
+    return <ConsentGate onEnter={() => setConsentGranted(true)} />
+  }
 
   return (
     <main className="app-shell">
       <header className="topbar">
-        <a className="wordmark" href="#home" aria-label="gME2 home">
-          <span className="wordmark-mark">g</span>ME<span className="wordmark-two">2</span>
+        <a className="wordmark" href="#" aria-label="app home">
+          <span className="wordmark-mark">e</span>dging<span className="wordmark-two">C</span>
         </a>
         <div className="topbar-right">
           <span className="status-dot" />
-          <span>STORY MODE</span>
+          <span>CONSENTED</span>
           <span className="age-chip">18+</span>
         </div>
       </header>
 
       <section className="hero" id="home" aria-labelledby="hero-title">
-        <div className="hero-art" aria-hidden="true">
-          <div className="orbit orbit-one" />
-          <div className="orbit orbit-two" />
-          <div className="moon" />
-          <div className="art-label">NO. 01&nbsp; / &nbsp;AFTER HOURS</div>
-          <div className="art-coordinate">40° 42′ 46.8″ N<br />74° 00′ 21.6″ W</div>
-        </div>
+        <div className="hero-art" aria-hidden="true" />
         <div className="hero-copy">
-          <p className="eyebrow"><span /> AN INTERACTIVE FICTION</p>
-          <h1 id="hero-title">The night<br />is <em>yours.</em></h1>
-          <p className="hero-description">Every secret has a story. Every choice leaves a mark. Step into a city that never tells the whole truth.</p>
+          <p className="eyebrow">
+            <span /> TEASE &amp; CONTROL
+          </p>
+          <h1 id="hero-title">Slow. Tease. Edge.</h1>
+          <p className="hero-description">
+            A browser-based edging tutorial &amp; session app for couples. Slow teasing,
+            edge control, hand grip techniques, and testicle stimulation.
+          </p>
           <div className="hero-meta">
-            <span><i className="meta-icon">◷</i> 3 CHAPTERS</span>
-            <span><i className="meta-icon">✳</i> YOUR CHOICES MATTER</span>
+            <span>
+              <i className="meta-icon">◷</i> Couple sync enabled
+            </span>
+            <span>
+              <i className="meta-icon">✳</i> 18+ with consent
+            </span>
           </div>
         </div>
-        <div className="hero-index" aria-hidden="true">01 <span>—</span> 03</div>
+        <div className="hero-index" aria-hidden="true">
+          01 <span>—</span> 01
+        </div>
       </section>
 
-      <section className="chapter-section" aria-labelledby="chapter-heading">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">CHOOSE YOUR OPENING</p>
-            <h2 id="chapter-heading">Where will you begin?</h2>
-          </div>
-          <span className="chapter-count">01 — 03</span>
-        </div>
-
-        <div className="chapter-grid" role="group" aria-label="Choose a chapter">
-          {chapters.map((chapter) => (
-            <button
-              className={`chapter-card ${chapter.tone} ${selectedChapter === chapter.number ? 'selected' : ''}`}
-              key={chapter.number}
-              type="button"
-              aria-pressed={selectedChapter === chapter.number}
-              onClick={() => {
-                setSelectedChapter(chapter.number)
-                setHasStarted(false)
-              }}
-            >
-              <span className="card-topline"><span>CHAPTER {chapter.number}</span><span className="card-arrow">↗</span></span>
-              <span className="card-title">{chapter.title}</span>
-              <span className="card-detail">{chapter.detail}</span>
-              <span className="card-art" aria-hidden="true"><span /></span>
-            </button>
-          ))}
-        </div>
-
-        <div className="play-row">
-          <p className="mature-note"><span>18+</span> Mature themes · Fictional story · Player discretion advised</p>
-          <button className="play-button" type="button" onClick={() => setHasStarted(true)}>
-            <span>{hasStarted ? 'SESSION READY' : 'BEGIN YOUR STORY'}</span>
-            <span className="play-icon" aria-hidden="true">↗</span>
-          </button>
-        </div>
-        {hasStarted && (
-          <p className="start-message" role="status">
-            Chapter {selectedChapter} is ready. Your story starts here.
-          </p>
-        )}
+      <section className="chapter-section">
+        <div className="chapter-grid">{renderScreen()}</div>
       </section>
 
       <footer className="footer">
-        <span>gME2 <span className="footer-divider">/</span> A STORY IN PROGRESS</span>
-        <span>BUILT FOR THE HOURS BETWEEN</span>
+        <span>
+          eC <span className="footer-divider">/</span> SESSION IN PROGRESS
+        </span>
+        <span>built for couples</span>
       </footer>
     </main>
   )
 }
-
-export default App
