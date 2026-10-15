@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import ChallengeHub from './components/ChallengeHub'
 import { useSessionTimer } from './hooks/useSessionTimer'
+import { createSoloSessionConfiguration, type SoloSessionConfiguration } from './lib/soloSession'
 import './App.css'
 
 type Screen = 'onboarding' | 'solo' | 'challenges'
+type SoloView = 'setup' | 'review' | 'session'
 
 const soloCards = [
   {
@@ -44,6 +46,8 @@ function App() {
   const [ageConfirmed, setAgeConfirmed] = useState(false)
   const [privacyAcknowledged, setPrivacyAcknowledged] = useState(false)
   const [personalizationEnabled, setPersonalizationEnabled] = useState(false)
+  const [soloView, setSoloView] = useState<SoloView>('setup')
+  const [activeSoloSession, setActiveSoloSession] = useState<SoloSessionConfiguration | null>(null)
   const { timer: previewTimer, dispatch: dispatchPreviewTimer } = useSessionTimer(45)
   const [selectedCardId, setSelectedCardId] = useState(soloCards[0].id)
   const { timer: soloTimer, dispatch: dispatchSoloTimer } = useSessionTimer(soloCards[0].duration * 60)
@@ -59,9 +63,13 @@ function App() {
   const challengeButtonRef = useRef<HTMLButtonElement | null>(null)
   const onboardingPanelRef = useRef<HTMLElement | null>(null)
   const soloHeadingRef = useRef<HTMLHeadingElement | null>(null)
-  const previousLocationRef = useRef({ screen, stage })
+  const soloViewHeadingRef = useRef<HTMLHeadingElement | null>(null)
+  const previousLocationRef = useRef({ screen, stage, soloView, soloTimerStatus: soloTimer.status })
 
   const selectedCard = soloCards.find((card) => card.id === selectedCardId) ?? soloCards[0]
+  const activeSoloCard = activeSoloSession
+    ? soloCards.find((card) => card.id === activeSoloSession.activityId) ?? null
+    : null
   const previewSeconds = Math.ceil(previewTimer.remainingMs / 1000)
   const soloSeconds = Math.ceil(soloTimer.remainingMs / 1000)
 
@@ -77,8 +85,17 @@ function App() {
       if (screen === 'solo') soloHeadingRef.current?.focus()
       if (screen === 'onboarding') onboardingPanelRef.current?.querySelector<HTMLElement>('h2')?.focus()
     }
-    previousLocationRef.current = { screen, stage }
-  }, [screen, stage])
+    if (
+      screen === 'solo'
+      && (
+        previousLocation.soloView !== soloView
+        || (previousLocation.soloTimerStatus !== 'complete' && soloTimer.status === 'complete')
+      )
+    ) {
+      soloViewHeadingRef.current?.focus()
+    }
+    previousLocationRef.current = { screen, stage, soloView, soloTimerStatus: soloTimer.status }
+  }, [screen, stage, soloView, soloTimer.status])
 
   function openPrivacyDetails() {
     pauseActiveTimers()
@@ -152,8 +169,42 @@ function App() {
     const card = soloCards.find((item) => item.id === cardId)
     if (!card) return
     setSelectedCardId(card.id)
-    dispatchSoloTimer({ type: 'reset', durationMs: card.duration * 60_000 })
     setReflection('')
+  }
+
+  function beginSoloSession(activityId: string, durationMs: number) {
+    const activity = soloCards.find((card) => card.id === activityId)
+    if (!activity) {
+      setNotice('Choose an available activity before starting a session.')
+      return
+    }
+
+    const prompt = personalizationEnabled ? activity.shortPrompt : activity.prompt
+    const configuration = createSoloSessionConfiguration(activity, durationMs, prompt)
+    if (!configuration) {
+      setNotice('This activity can only use its listed session length.')
+      return
+    }
+
+    setSelectedCardId(activity.id)
+    setActiveSoloSession(configuration)
+    setReflection('')
+    dispatchSoloTimer({ type: 'reset', durationMs: configuration.durationMs })
+    dispatchSoloTimer({ type: 'start', nowMs: performance.now() })
+    setSoloView('session')
+  }
+
+  function returnToSoloSetup() {
+    dispatchSoloTimer({ type: 'pause', nowMs: performance.now() })
+    setSoloView('setup')
+  }
+
+  function discardSoloSession() {
+    dispatchSoloTimer({ type: 'stop' })
+    setActiveSoloSession(null)
+    setReflection('')
+    setSoloView('setup')
+    setNotice('The session was stopped. Your activity selection is unchanged.')
   }
 
   function resetPreview() {
@@ -423,55 +474,90 @@ function App() {
               setScreen('onboarding')
             }}>← Onboarding</button>
           </div>
-          <div className="solo-grid">
-            <section className="library-panel" aria-labelledby="library-title">
+          <div className={`solo-grid ${soloView === 'session' ? 'solo-grid-session' : ''}`}>
+            {soloView !== 'session' && <section className="library-panel" aria-labelledby="library-title">
               <p className="card-kicker">YOUR CARD LIBRARY</p><h2 id="library-title">Choose what feels right.</h2>
               <div className="solo-card-list" role="group" aria-label="Solo cards">
                 {soloCards.map((card, index) => (
-                  <button className={`solo-library-card ${selectedCardId === card.id ? 'selected' : ''}`} type="button" key={card.id} aria-pressed={selectedCardId === card.id} disabled={soloTimer.status === 'running'} onClick={() => selectSoloCard(card.id)}>
+                  <button className={`solo-library-card ${selectedCardId === card.id ? 'selected' : ''}`} type="button" key={card.id} aria-pressed={selectedCardId === card.id} onClick={() => selectSoloCard(card.id)}>
                     <span className="library-card-index">0{index + 1}</span><span className="library-card-copy"><strong>{card.title}</strong><small>{card.description}</small></span><span className="library-card-time">{card.duration} MIN</span>
                   </button>
                 ))}
               </div>
-              {soloTimer.status === 'running' && <p className="fine-print library-note">Pause the timer before choosing a different card.</p>}
-              <div className="solo-guidance"><p className="card-kicker">A GENTLE PROMPT</p><p>{personalizationEnabled ? selectedCard.shortPrompt : selectedCard.prompt}</p></div>
-            </section>
+              <div className="solo-guidance"><p className="card-kicker">A GENTLE PROMPT</p><p>{personalizationEnabled ? selectedCard.shortPrompt : selectedCard.prompt}</p><p className="library-card-time">SET LENGTH · {selectedCard.duration} MINUTES</p></div>
+              {activeSoloSession && activeSoloCard && soloTimer.status === 'paused' && (
+                <div className="paused-session-note" role="status">
+                  <p className="card-kicker">PAUSED SESSION</p>
+                  <p><strong>{activeSoloCard.title}</strong> · {activeSoloCard.duration} minutes. This session keeps the activity and timing selected when it began.</p>
+                  <div className="button-row">
+                    <button className="button button-outline button-small" type="button" onClick={() => setSoloView('session')}>Return to paused session</button>
+                    <button className="button button-quiet button-small" type="button" onClick={discardSoloSession}>Discard session</button>
+                  </div>
+                </div>
+              )}
+            </section>}
             <section className="solo-timer-panel" aria-label="Guided timer">
-              {soloTimer.status === 'complete' ? (
+              {soloView === 'setup' && (
+                <div className="session-setup-summary">
+                  <p className="card-kicker">SESSION SETUP</p>
+                  <h2 ref={soloViewHeadingRef} tabIndex={-1}>{activeSoloSession ? 'A session is paused.' : 'Choose a moment.'}</h2>
+                  <p className="body-copy">{activeSoloSession ? 'Return to the paused session or discard it before starting another. Your current activity selection will not change its settings.' : 'Review the selected activity and its listed length before the timer begins.'}</p>
+                  {!activeSoloSession && (
+                    <button className="button button-primary" type="button" onClick={() => setSoloView('review')}>Review session</button>
+                  )}
+                </div>
+              )}
+              {soloView === 'review' && (
+                <div className="session-review">
+                  <p className="card-kicker">REVIEW YOUR SESSION</p>
+                  <h2 ref={soloViewHeadingRef} tabIndex={-1}>{selectedCard.title}</h2>
+                  <p className="body-copy">{personalizationEnabled ? selectedCard.shortPrompt : selectedCard.prompt}</p>
+                  <dl className="session-review-details">
+                    <div><dt>Activity</dt><dd>{selectedCard.title}</dd></div>
+                    <div><dt>Timer length</dt><dd>{selectedCard.duration} minutes</dd></div>
+                  </dl>
+                  <p className="fine-print">This activity uses its listed length. Adjustable timer ranges are not defined for this prototype.</p>
+                  <div className="button-row">
+                    <button className="button button-quiet" type="button" onClick={() => setSoloView('setup')}>Back to setup</button>
+                    <button className="button button-primary" type="button" onClick={() => beginSoloSession(selectedCard.id, selectedCard.duration * 60_000)}>Start session</button>
+                  </div>
+                </div>
+              )}
+              {soloView === 'session' && soloTimer.status === 'complete' && activeSoloCard ? (
                 <div className="completion-state" role="status">
-                  <span className="completion-symbol" aria-hidden="true">✳</span><p className="card-kicker">SESSION COMPLETE</p><h2>Thank yourself<br />for showing up.</h2>
+                  <span className="completion-symbol" aria-hidden="true">✳</span><p className="card-kicker">SESSION COMPLETE</p><h2 ref={soloViewHeadingRef} tabIndex={-1}>Thank yourself<br />for showing up.</h2>
+                  <p className="solo-timer-label">{activeSoloCard.title} · {activeSoloCard.duration} minutes</p>
                   <p className="body-copy">That moment was yours. Nothing in this prototype was saved.</p>
                   <p className="card-kicker reflection-label">OPTIONAL CHECK-IN</p>
                   <div className="reflection-choices" role="group" aria-label="Optional session reflection">
                     {['Grounded', 'Curious', 'Not for me'].map((item) => <button className={`reflection-chip ${reflection === item ? 'selected' : ''}`} type="button" key={item} aria-pressed={reflection === item} onClick={() => setReflection(item)}>{item}</button>)}
                   </div>
-                  <button className="button button-primary" type="button" onClick={() => selectSoloCard(selectedCardId)}>Choose another moment</button>
+                  <div className="button-row">
+                    <button className="button button-quiet" type="button" onClick={discardSoloSession}>Choose another moment</button>
+                    <button className="button button-primary" type="button" onClick={() => activeSoloCard && beginSoloSession(activeSoloCard.id, activeSoloSession?.durationMs ?? activeSoloCard.duration * 60_000)}>Start again</button>
+                  </div>
                 </div>
-              ) : (
+              ) : soloView === 'session' && activeSoloSession && activeSoloCard ? (
                 <>
                   <p className="card-kicker">{soloTimer.status === 'paused' ? 'PAUSED · TAKE YOUR TIME' : 'GO AT YOUR OWN PACE'}</p>
+                  <h2 className="active-session-title" ref={soloViewHeadingRef} tabIndex={-1}>{activeSoloCard.title}</h2>
+                  <p className="body-copy active-session-prompt">{activeSoloSession.prompt}</p>
                   <div className="solo-countdown" aria-label={`Time remaining ${formatTime(soloSeconds)}`}>{formatTime(soloSeconds)}</div>
-                  <p className="solo-timer-label">{selectedCard.duration} minute{selectedCard.duration === 1 ? '' : 's'} · {selectedCard.title}</p>
-                  <div className="timer-progress" role="progressbar" aria-label="Session progress" aria-valuemin={0} aria-valuemax={selectedCard.duration * 60} aria-valuenow={selectedCard.duration * 60 - soloSeconds}>
-                    <span style={{ width: `${((selectedCard.duration * 60 - soloSeconds) / (selectedCard.duration * 60)) * 100}%` }} />
+                  <p className="solo-timer-label">{activeSoloCard.duration} minute{activeSoloCard.duration === 1 ? '' : 's'} · selected before session</p>
+                  <div className="timer-progress" role="progressbar" aria-label="Session progress" aria-valuemin={0} aria-valuemax={activeSoloSession.durationMs / 1000} aria-valuenow={activeSoloSession.durationMs / 1000 - soloSeconds}>
+                    <span style={{ width: `${((activeSoloSession.durationMs / 1000 - soloSeconds) / (activeSoloSession.durationMs / 1000)) * 100}%` }} />
                   </div>
                   <div className="solo-control-row">
                     <button className="button button-primary" type="button" onClick={() => {
                       if (soloTimer.status === 'running') dispatchSoloTimer({ type: 'pause', nowMs: performance.now() })
                       else dispatchSoloTimer({ type: soloTimer.status === 'paused' ? 'resume' : 'start', nowMs: performance.now() })
                     }}>{soloTimer.status === 'running' ? 'Pause' : soloTimer.status === 'paused' ? 'Resume' : 'Begin session'}</button>
-                    <button className="button button-outline" type="button" disabled={soloTimer.status === 'idle'} onClick={() => {
-                      dispatchSoloTimer({ type: 'stop' })
-                      setNotice('Session stopped. You can begin again whenever you like.')
-                    }}>Stop</button>
-                    <button className="button button-quiet" type="button" disabled={soloTimer.status === 'idle'} onClick={() => {
-                      const currentIndex = soloCards.findIndex((card) => card.id === selectedCardId)
-                      selectSoloCard(soloCards[(currentIndex + 1) % soloCards.length].id)
-                    }}>Skip</button>
+                    <button className="button button-outline" type="button" onClick={discardSoloSession}>Stop session</button>
+                    <button className="button button-quiet" type="button" onClick={returnToSoloSetup}>Pause and return to setup</button>
                   </div>
-                  <p className="solo-safety">Pause, stop or skip whenever you want. No progress is lost.</p>
+                  <p className="solo-safety">Pause, stop or return to setup whenever you want. Returning never resumes automatically.</p>
                 </>
-              )}
+              ) : null}
             </section>
           </div>
           <div className="solo-bottom-row">

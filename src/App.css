@@ -126,6 +126,7 @@
 .solo-heading-row .eyebrow { margin-bottom: 13px; }
 .solo-heading-row h1 { font-size: clamp(35px, 5vw, 54px); }
 .solo-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 16px; }
+.solo-grid-session { grid-template-columns: minmax(0, 760px); justify-content: center; }
 .library-panel, .solo-timer-panel { padding: 23px; border: 1px solid var(--line); border-radius: 6px; background: #18171b; }
 .library-panel h2 { margin-bottom: 17px; font-size: 22px; }
 .solo-card-list { display: flex; flex-direction: column; gap: 8px; }
@@ -140,6 +141,20 @@
 .solo-guidance { margin-top: 18px; padding: 14px; border-left: 2px solid var(--lilac); background: #d7b9ff08; }
 .solo-guidance .card-kicker { margin-bottom: 7px; }
 .solo-guidance > p:last-child { margin: 0; color: #c4bbc9; font-family: Georgia, serif; font-size: 14px; line-height: 1.55; }
+.solo-guidance .library-card-time { margin-top: 12px; font: 8px var(--mono); letter-spacing: .08em; }
+.paused-session-note { margin-top: 17px; padding: 14px; border: 1px solid #d7b9ff35; border-radius: 4px; background: #d7b9ff08; text-align: left; }
+.paused-session-note > p:not(.card-kicker) { margin: 0; color: #c4bbc9; font-size: 11px; line-height: 1.6; }
+.paused-session-note .button-row { flex-wrap: wrap; margin-top: 12px; }
+.session-setup-summary, .session-review { width: min(400px, 100%); }
+.session-setup-summary h2, .session-review h2 { margin: 0 0 12px; color: var(--cream); font-size: 27px; font-weight: 400; letter-spacing: -.04em; }
+.session-setup-summary .body-copy, .session-review .body-copy { margin-bottom: 18px; }
+.session-review-details { width: 100%; margin: 19px 0 0; text-align: left; }
+.session-review-details div { display: flex; justify-content: space-between; gap: 15px; padding: 10px 0; border-top: 1px solid var(--line); }
+.session-review-details dt { color: var(--muted); font-size: 10px; }
+.session-review-details dd { margin: 0; color: var(--cream); font-size: 10px; text-align: right; }
+.session-review .button-row { justify-content: center; flex-wrap: wrap; margin-top: 18px; }
+.active-session-title { margin: 0 0 10px; color: var(--cream); font-size: 25px; font-weight: 400; letter-spacing: -.04em; }
+.active-session-prompt { max-width: 420px; margin-bottom: 16px; }
 .solo-timer-panel { display: flex; min-height: 375px; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: radial-gradient(ellipse at 50% 0, #503c592b, transparent 55%), #18171b; }
 .solo-timer-panel > .card-kicker { align-self: center; margin-bottom: 14px; }
 .solo-countdown { color: var(--cream); font: clamp(52px, 7vw, 76px) var(--mono); letter-spacing: -.1em; }
@@ -203,6 +218,9 @@
   .library-panel, .solo-timer-panel { padding: 18px; }
   .solo-control-row { flex-wrap: wrap; }
   .solo-control-row .button-primary { min-width: 110px; }
+  .solo-grid-session .solo-timer-panel { min-width: 0; }
+  .solo-control-row .button { max-width: 100%; }
+  .paused-session-note .button-row { align-items: stretch; flex-direction: column; }
   .solo-bottom-row { align-items: flex-start; flex-direction: column; }
   .footer { font-size: 8px; }
 }
