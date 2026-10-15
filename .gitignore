@@ -12,6 +12,8 @@ dist
 dist-ssr
 dist-server
 *.local
+playwright-report
+test-results
 
 # Local server configuration
 .env

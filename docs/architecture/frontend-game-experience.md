@@ -1,21 +1,12 @@
 # Frontend game experience specification
 
-**Status:** design proposal with an initial frontend implementation in this checkout. A separate implementation report was provided, but its changes are not present here. This document does not select a backend or add persistence.
+**Status:** initial implementation with connected solo-session configuration. Solo sessions and challenge progress remain anonymous and in memory. This document does not select a backend or add persistence.
 
 ### Implementation progress
 
-The initial implementation adds a shared deadline-based timer state machine for the preview and solo sessions, pauses running timers when the document becomes hidden, and exposes Solo and Challenges in the header. The challenge completion screen now offers a direct return to Solo. Navigation changes move focus to the new screen heading, and primary controls use larger touch targets. Remaining design and acceptance criteria below are implementation targets, not claims that the full redesign has shipped.
+Solo setup now selects an existing activity, reviews its fixed duration and prompt, then starts from an immutable session configuration. Users may pause and return to setup; returning to the session is explicit, and changing the next activity does not alter the paused session. Hidden-tab transitions pause without automatically resuming. Challenge completion offers a direct return to Solo. Navigation changes move focus to the new screen heading, and primary controls use larger touch targets. Adjustable duration ranges remain undefined and are not offered.
 
-### Separate implementation report (not present in this checkout)
-
-A user-provided completion summary reports a different frontend implementation with:
-
-- `HashRouter`-based navigation through consent, technique, builder, timer, and history screens.
-- A shared topbar with a wordmark, live status indicator, and 18+ chip, plus a footer with version, RACK/SSC, and PWA indicators.
-- New `BallTeaseScreen`, `SessionBuilder`, `SessionTimer`, and `HistoryScreen` navigation callbacks; the timer was reportedly changed from `setInterval` to `requestAnimationFrame`.
-- Passing lint, typecheck, build, and a running development server.
-
-This is recorded as a report, not as verified repository state. At the time this note was added, the current checkout still contains the onboarding / solo / challenge experience described in this specification: `src/App.tsx` has no router, the reported screen files are absent, and `package.json` has no `typecheck` script or router dependency. The report's screen flow, RACK/SSC language, PWA footer, and verification results therefore must not be treated as implemented here. Reconcile the report with its source branch/worktree before applying or merging any of those changes; do not replace the existing anonymous-first product rules or challenge experience based on this summary alone.
+The Playwright browser journey covers setup through completion, keyboard selection and focus, hidden-tab pause, reload behavior, and narrow/desktop viewport overflow checks. These checks do not establish timer drift below a measured threshold or replace assistive-technology testing.
 
 ## 1. Audit: current experience and behavior
 
@@ -25,14 +16,14 @@ This is recorded as a report, not as verified repository state. At the time this
 - [challenges.ts](../../src/data/challenges.ts) defines three collections—Intentional Moments, Better Conversations, and Everyday Appreciation—with seven nonsexual, low-pressure prompts each.
 - [challengeProgress.ts](../../src/lib/challengeProgress.ts) normalizes progress, completes activities idempotently, finds the first incomplete activity, and determines completion. [challengeProgress.test.mjs](../../test/challengeProgress.test.mjs) covers these rules.
 - Styling is in [index.css](../../src/index.css), [App.css](../../src/App.css), and [ChallengeHub.css](../../src/components/ChallengeHub.css). The existing identity is a dark plum-black canvas, cream text, lilac accents, muted mint success, sans-serif UI type, Georgia display accents, and monospaced labels. Layouts currently collapse at 760px and 480px; reduced-motion overrides exist.
-- `npm run lint`, `npm test`, and `npm run build` are the available checks. There is no UI-test or browser-automation framework in the dependency set.
+- `npm run lint`, `npm test`, `npm run test:browser`, and `npm run build` cover static checks, pure logic, the browser journey, and production compilation.
 - Git was clean on `main` tracking `origin/main` at audit time. The backend proposal is [backend-plan.md](./backend-plan.md); keep it separate from this frontend proposal.
 
 ### Current journey and rules to preserve
 
 1. **Experience preview:** onboarding starts at Experience. The sample is a 45-second preview, explicitly not a real session or saved data. The user must self-attest as 18+ to start it, skip to solo, or continue. Unchecking 18+ pauses a running preview.
 2. **Privacy and choice:** continuing opens Privacy. The optional shorter-prompt preference is in memory and off by default; privacy acknowledgement is required to continue to Your choice. Solo entry is also available directly from the first stage after age attestation.
-3. **Solo:** three cards run for two, five, and two minutes. The user can pause/resume, stop and reset, or skip to the next card. A completed session offers an optional categorical check-in; selecting another moment resets the timer. Choices are not saved across reloads.
+3. **Solo:** choose one of three cards (two, five, and two minutes), review its prompt and fixed duration, then explicitly start. The active session snapshots its activity, prompt, and duration. Pause/resume is explicit; stop returns to setup; returning to setup pauses and retains the session until the user resumes or discards it. Completion offers an optional categorical check-in and restart. Choices are not saved across reloads.
 4. **Challenge entry:** the header's Challenges action requires both age attestation and privacy acknowledgement. The catalog presents all three collections; progress is visible while the challenge component remains mounted in this page and is lost on reload.
 5. **Challenge selection and activity:** Explore opens a collection overview; Start/Continue opens its first incomplete activity. Activities may be chosen in any order. Completing an activity marks it once and moves to the first unfinished activity. A completed activity can be revisited without duplicating completion. The optional categorical check-in has no free-text input and is cleared when changing cards, leaving, or completing.
 6. **Pause and exit:** Pause for now / Leave without completing returns to that collection's detail view without removing completed activities. Leaving the challenge hub returns to onboarding. There are no streaks, deadlines, or reminders.
@@ -40,7 +31,7 @@ This is recorded as a report, not as verified repository state. At the time this
 8. **Partner invitation:** the onboarding choice is a consent-gated simulation. Its link is non-redeemable, and accept/decline only changes local preview text; no partner session or service exists.
 9. **Privacy and clearing:** app choices are temporary in-memory state; there is no account, app API, analytics, or durable progress. The onboarding clear dialog covers some app/demo choices; challenge progress has its own clear confirmation.
 
-The solo timer and sample timer use one-second interval decrements while their screen is active and pause on in-app navigation. They do not currently reconcile elapsed wall time after browser-tab throttling. The challenge activities do **not** have timers; do not add one merely to make the experience feel more game-like.
+The sample and solo timers use the shared deadline-based reducer, with `performance.now()` for elapsed-time calculations. The UI refresh cadence does not determine elapsed time. Both pause on hidden-tab changes and in-app navigation; resuming always requires an explicit action. The challenge activities do **not** have timers; do not add one merely to make the experience feel more game-like.
 
 ## 2. Experience design
 
@@ -54,7 +45,7 @@ Use an **elegant, intimate, editorial** direction with restrained cinematic dept
 
 - **First visit:** retain the three-stage Experience → Privacy → Your choice trust flow, sample preview, 18+ self-attestation, and explicit privacy acknowledgement. Keep solo access anonymous.
 - **Returning within the page:** provide a compact persistent header with the gME2 home action and two clear destinations: **Solo** and **Challenges**. Keep Privacy details reachable without making the experience feel like a settings maze. Do not add account navigation until an account flow is actually approved and built.
-- **Solo:** card library → selected-card guidance and timer → completion/check-in → choose another card or return to the library.
+- **Solo:** activity setup → review of the selected prompt and fixed length → active session → completion/check-in → restart or return to setup. A paused session remains separate from later setup edits.
 - **Challenges:** collection catalog → collection overview → activity → completion feedback / next incomplete activity → optional badge preview → catalog or exit.
 - Use buttons for state transitions, not fake links. Preserve a clear return path on every detail, activity, badge, and dialog state. The header/home action should confirm before discarding an active timer or pause it consistently.
 
@@ -112,19 +103,16 @@ Do not persist private check-ins, reflection text, timer telemetry, or partner-v
 - **Desktop:** at 1024 CSS px and above, content uses a readable centered max-width, collection cards form a balanced grid, and activity prompt plus optional context remain visually distinct.
 - **Keyboard and assistive technology:** every action is keyboard-operable; focus is visible and not obscured; screen changes move focus to the new heading; dialogs trap focus, close with Escape, and restore focus; progress has an accessible name and current/max values; icon-only controls have accessible names; state and errors are announced without announcing every timer tick.
 - **Contrast and motion:** normal text meets WCAG 2.2 AA 4.5:1 contrast (large text at least 3:1); focus indicator is visibly distinct; reduced-motion mode removes nonessential transitions/animation without hiding state.
-- **Timer correctness:** exact duration is preserved despite delayed interval callbacks; pause freezes remaining time; resume continues from it; stop/start-over resets to the selected duration; navigation and hidden-tab transitions pause; completion occurs once at zero and does not auto-advance.
+- **Timer correctness:** displayed remaining time is derived from a monotonic deadline, not callback count; pause freezes remaining time; resume continues from it; stop/restart resets to the selected duration; hidden-tab transitions pause; completion occurs once at zero and does not auto-advance.
 - **Challenge progression:** completion is explicit, idempotent, and valid only for an in-range activity; selection order does not change the next-incomplete rule; revisits do not double-count; leaving/canceling preserves completed activities; only all seven completed activities unlock the badge.
 - **Completion and privacy:** completion has a non-blocking announcement and opt-in badge preview; badge output contains only approved fields and attribution remains off by default; no account is needed; no check-in is required, auto-shared, or included in progress/badge output; clearing requires confirmation and cancel preserves state.
 - **Behavior preservation:** 18+ self-attestation still gates preview/solo/challenge access as currently specified; privacy acknowledgement still gates challenge access; sample preview, three solo cards and durations, all 21 prompts, optional check-ins, badge export, and demo-only invitation remain available. The invitation is labeled simulated/non-redeemable.
-- **Automated coverage:** retain and extend pure Node tests for timer transitions, progress normalization/idempotency, arbitrary-order completion, replay, and clear/cancel behavior. Add browser-level journey, keyboard/focus, and responsive tests only with an explicitly chosen test harness; no such harness is currently installed.
+- **Automated coverage:** pure Node tests cover timer transitions, progress normalization/idempotency, arbitrary-order completion, catalog ID stability, and fixed session configuration validation. Playwright covers the connected browser journey, keyboard selection/focus, hidden-tab pause, reload behavior, and 320/390/1280px overflow checks. Device and screen-reader verification remains manual.
 
-## 6. Ordered implementation plan
+## 6. Follow-up implementation plan
 
-1. **Agree the journey and rules:** approve navigation labels, timer hidden-tab pause behavior, restart confirmation, and progress lifetime copy before visual implementation.
-2. **Establish UI/domain seams:** extract feature-level state transitions and timer/progress helpers from the large app component; preserve current runtime behavior while adding focused unit tests.
-3. **Build the shared shell and trust flow:** implement responsive navigation, onboarding stages, 18+ gate, privacy acknowledgement/details, and safe screen transitions without changing the anonymous-first model.
-4. **Refine the solo loop:** standardize activity-card and timer components, make timer elapsed-time accurate, implement explicit pause/stop/restart/exit behavior, and retain optional categorical check-in.
-5. **Refine challenge discovery and progression:** build catalog, overview, activity, progress, optional check-in, completion, and confirmed reset from the current content and pure domain rules.
-6. **Connect badge and simulated invitation:** retain privacy-limited local export and clearly labeled non-redeemable partner simulation; surface export failures and cancellation honestly.
-7. **Verify and tune:** run lint, domain/unit tests, and build; add journey/accessibility/responsive tests using an agreed browser-test dependency; manually check keyboard, screen-reader announcements, reduced motion, 320px mobile, and desktop.
-8. **Prepare the future persistence seam:** only when the backend workstream and product/privacy decisions are ready, implement an adapter against an agreed contract. Keep anonymous in-memory mode intact and do not invent endpoints or migrate anonymous state implicitly.
+1. **Verify accessibility and usability:** manually exercise screen-reader announcements, reduced motion, focus visibility, and touch targets across real devices; automated browser coverage does not replace these checks.
+2. **Refine component boundaries:** extract setup/review/session presentation and navigation feedback from `App.tsx` only where it reduces complexity without duplicating session state or timer ownership.
+3. **Tune the visual system:** validate contrast against WCAG 2.2 AA and refine responsive spacing while retaining the current plum, cream, lilac, and mint identity and “At your pace.”
+4. **Decide adjustable timing:** if user-configurable durations are desired, define and approve valid bounds before exposing controls; preserve the current fixed, catalog-provided durations until then.
+5. **Prepare future persistence only after approval:** use a typed adapter against an agreed backend contract. Keep anonymous in-memory mode intact; do not invent endpoints or migrate anonymous state implicitly.
