@@ -26,6 +26,7 @@ The production build is written to `dist/`. To preview it locally, run `npm run 
 
 ## Prototype boundaries
 
+- The repository-backed architecture assessment and implementation sequence are in [docs/architecture/backend-plan.md](docs/architecture/backend-plan.md). It is a proposal, not an implemented backend or a production privacy/security assessment.
 - The 18+ check is a self-attestation, not identity or age verification.
 - The three 7-activity challenges (Intentional Moments, Better Conversations, and Everyday Appreciation) are frontend-only. Progress and optional categorical check-ins remain in page memory and reset when the page reloads or closes. There are no streaks, deadlines, or automatic reminders.
 - Challenge activities are designed to work solo or as optional conversation prompts. Partner synchronization, invitations, secure referral attribution, and challenge landing pages are not connected.
