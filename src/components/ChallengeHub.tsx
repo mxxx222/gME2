@@ -6,6 +6,7 @@ import './ChallengeHub.css'
 type ChallengeHubProps = {
   hidden: boolean
   onExit: () => void
+  onEnterSolo: () => void
 }
 
 type View = 'catalog' | 'detail' | 'activity' | 'complete' | 'badge'
@@ -119,7 +120,7 @@ function getCompletionLabel(doneCount: number) {
   return `${doneCount} of 7 activities complete`
 }
 
-export default function ChallengeHub({ hidden, onExit }: ChallengeHubProps) {
+export default function ChallengeHub({ hidden, onExit, onEnterSolo }: ChallengeHubProps) {
   const screenRef = useRef<HTMLElement | null>(null)
   const [view, setView] = useState<View>('catalog')
   const [activeChallengeId, setActiveChallengeId] = useState<string | null>(null)
@@ -404,6 +405,7 @@ export default function ChallengeHub({ hidden, onExit }: ChallengeHubProps) {
           <div className="challenge-actions">
             <button className="button button-primary" type="button" onClick={previewBadge}>Preview share badge</button>
             <button className="button button-outline" type="button" onClick={() => setView('catalog')}>Explore another challenge</button>
+            <button className="button button-quiet" type="button" onClick={onEnterSolo}>Return to Solo</button>
             <button className="button button-quiet" type="button" onClick={onExit}>Return to gME2</button>
           </div>
           <p className="fine-print">Public sharing is optional. The preview contains only the challenge name, seven-day duration, and completion date. The date appears only if you choose to preview a badge.</p>

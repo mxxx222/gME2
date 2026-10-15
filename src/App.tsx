@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import ChallengeHub from './components/ChallengeHub'
+import { useSessionTimer } from './hooks/useSessionTimer'
 import './App.css'
 
 type Screen = 'onboarding' | 'solo' | 'challenges'
-type TimerStatus = 'idle' | 'running' | 'paused' | 'complete'
 
 const soloCards = [
   {
@@ -44,11 +44,9 @@ function App() {
   const [ageConfirmed, setAgeConfirmed] = useState(false)
   const [privacyAcknowledged, setPrivacyAcknowledged] = useState(false)
   const [personalizationEnabled, setPersonalizationEnabled] = useState(false)
-  const [previewSeconds, setPreviewSeconds] = useState(45)
-  const [previewStatus, setPreviewStatus] = useState<TimerStatus>('idle')
+  const { timer: previewTimer, dispatch: dispatchPreviewTimer } = useSessionTimer(45)
   const [selectedCardId, setSelectedCardId] = useState(soloCards[0].id)
-  const [soloSeconds, setSoloSeconds] = useState(soloCards[0].duration * 60)
-  const [soloStatus, setSoloStatus] = useState<TimerStatus>('idle')
+  const { timer: soloTimer, dispatch: dispatchSoloTimer } = useSessionTimer(soloCards[0].duration * 60)
   const [inviteCreated, setInviteCreated] = useState(false)
   const [inviteConsent, setInviteConsent] = useState(false)
   const [recipientPreview, setRecipientPreview] = useState(false)
@@ -59,13 +57,28 @@ function App() {
   const [notice, setNotice] = useState('')
   const dialogRef = useRef<HTMLElement | null>(null)
   const challengeButtonRef = useRef<HTMLButtonElement | null>(null)
+  const onboardingPanelRef = useRef<HTMLElement | null>(null)
+  const soloHeadingRef = useRef<HTMLHeadingElement | null>(null)
+  const previousLocationRef = useRef({ screen, stage })
 
   const selectedCard = soloCards.find((card) => card.id === selectedCardId) ?? soloCards[0]
+  const previewSeconds = Math.ceil(previewTimer.remainingMs / 1000)
+  const soloSeconds = Math.ceil(soloTimer.remainingMs / 1000)
 
   function pauseActiveTimers() {
-    setPreviewStatus((status) => status === 'running' ? 'paused' : status)
-    setSoloStatus((status) => status === 'running' ? 'paused' : status)
+    const nowMs = performance.now()
+    dispatchPreviewTimer({ type: 'pause', nowMs })
+    dispatchSoloTimer({ type: 'pause', nowMs })
   }
+
+  useEffect(() => {
+    const previousLocation = previousLocationRef.current
+    if (previousLocation.screen !== screen || (screen === 'onboarding' && previousLocation.stage !== stage)) {
+      if (screen === 'solo') soloHeadingRef.current?.focus()
+      if (screen === 'onboarding') onboardingPanelRef.current?.querySelector<HTMLElement>('h2')?.focus()
+    }
+    previousLocationRef.current = { screen, stage }
+  }, [screen, stage])
 
   function openPrivacyDetails() {
     pauseActiveTimers()
@@ -95,34 +108,6 @@ function App() {
     setScreen('onboarding')
     challengeButtonRef.current?.focus()
   }
-
-  useEffect(() => {
-    if (previewStatus !== 'running' || screen !== 'onboarding' || stage !== 1) return
-    const interval = window.setInterval(() => {
-      setPreviewSeconds((seconds) => {
-        if (seconds <= 1) {
-          setPreviewStatus('complete')
-          return 0
-        }
-        return seconds - 1
-      })
-    }, 1000)
-    return () => window.clearInterval(interval)
-  }, [previewStatus, screen, stage])
-
-  useEffect(() => {
-    if (soloStatus !== 'running' || screen !== 'solo') return
-    const interval = window.setInterval(() => {
-      setSoloSeconds((seconds) => {
-        if (seconds <= 1) {
-          setSoloStatus('complete')
-          return 0
-        }
-        return seconds - 1
-      })
-    }, 1000)
-    return () => window.clearInterval(interval)
-  }, [soloStatus, screen])
 
   useEffect(() => {
     if (!showDeleteDialog) return
@@ -155,11 +140,11 @@ function App() {
     if (!ageConfirmed) {
       setScreen('onboarding')
       setStage(1)
+      setNotice('Please confirm that you are 18 or older before entering solo.')
       return
     }
     setScreen('solo')
     setStage(3)
-    setSoloStatus('idle')
     setNotice('')
   }
 
@@ -167,14 +152,12 @@ function App() {
     const card = soloCards.find((item) => item.id === cardId)
     if (!card) return
     setSelectedCardId(card.id)
-    setSoloSeconds(card.duration * 60)
-    setSoloStatus('idle')
+    dispatchSoloTimer({ type: 'reset', durationMs: card.duration * 60_000 })
     setReflection('')
   }
 
   function resetPreview() {
-    setPreviewSeconds(45)
-    setPreviewStatus('idle')
+    dispatchPreviewTimer({ type: 'reset', durationMs: 45_000 })
   }
 
   function clearDemoData() {
@@ -228,17 +211,19 @@ function App() {
   return (
     <main className="app-shell">
       <header className="topbar">
-        <a className="wordmark" href="#home" aria-label="gME2 home" onClick={(event) => {
-          event.preventDefault()
+        <button className="wordmark" type="button" aria-label="gME2 home" onClick={() => {
           pauseActiveTimers()
           setScreen('onboarding')
           setStage(1)
         }}>
           <span className="wordmark-mark">g</span>ME<span className="wordmark-two">2</span>
-        </a>
+        </button>
         <div className="topbar-right">
           <span className="topbar-caption">INTIMACY, AT YOUR PACE</span>
-          <button className="topbar-action" ref={challengeButtonRef} type="button" onClick={openChallenges}>Challenges</button>
+          <nav className="primary-navigation" aria-label="Main navigation">
+            <button className="topbar-action" type="button" aria-current={screen === 'solo' ? 'page' : undefined} onClick={enterSolo}>Solo</button>
+            <button className="topbar-action" ref={challengeButtonRef} type="button" aria-current={screen === 'challenges' ? 'page' : undefined} onClick={openChallenges}>Challenges</button>
+          </nav>
           <span className="age-chip">18+</span>
         </div>
       </header>
@@ -262,18 +247,18 @@ function App() {
             ))}
           </nav>
 
-          <section className="content-panel" aria-live="polite">
+          <section className="content-panel" ref={onboardingPanelRef} aria-live="polite">
             {stage === 1 && (
               <div className="stage-layout">
                 <div className="stage-copy">
                   <p className="eyebrow">01 / EXPERIENCE</p>
-                  <h2>Try a small moment.<br />No account needed.</h2>
+                  <h2 tabIndex={-1}>Try a small moment.<br />No account needed.</h2>
                   <p className="body-copy">Explore one complete sample card and timer before deciding whether this is for you. This preview is not a real session and nothing is saved.</p>
                   <label className="check-row age-check">
                     <input type="checkbox" checked={ageConfirmed} onChange={(event) => {
                       const confirmed = event.target.checked
                       setAgeConfirmed(confirmed)
-                      if (!confirmed) setPreviewStatus((status) => status === 'running' ? 'paused' : status)
+                      if (!confirmed) dispatchPreviewTimer({ type: 'pause', nowMs: performance.now() })
                     }} />
                     <span>I confirm that I am 18 or older.</span>
                   </label>
@@ -288,16 +273,16 @@ function App() {
                     <span className="timer" aria-label={`Time remaining ${formatTime(previewSeconds)}`} aria-live="off">{formatTime(previewSeconds)}</span>
                     <span className="timer-caption">SAMPLE TIMER</span>
                   </div>
-                  {previewStatus === 'complete' ? (
+                  {previewTimer.status === 'complete' ? (
                     <div className="timer-message" role="status">That was your sample. <button className="text-button" type="button" onClick={resetPreview}>Try it again</button></div>
                   ) : (
                     <div className="timer-controls">
-                      <button className="button button-primary button-small" type="button" disabled={!ageConfirmed || previewStatus === 'running'} onClick={() => setPreviewStatus('running')}>
-                        {previewStatus === 'paused' ? 'Resume' : previewStatus === 'running' ? 'In progress' : 'Start sample'}
+                      <button className="button button-primary button-small" type="button" disabled={!ageConfirmed || previewTimer.status === 'running'} onClick={() => dispatchPreviewTimer({ type: previewTimer.status === 'paused' ? 'resume' : 'start', nowMs: performance.now() })}>
+                        {previewTimer.status === 'paused' ? 'Resume' : previewTimer.status === 'running' ? 'In progress' : 'Start sample'}
                       </button>
-                      {previewStatus !== 'idle' && (
-                        <button className="button button-quiet button-small" type="button" onClick={() => previewStatus === 'running' ? setPreviewStatus('paused') : resetPreview()}>
-                          {previewStatus === 'running' ? 'Pause' : 'Start over'}
+                      {previewTimer.status !== 'idle' && (
+                        <button className="button button-quiet button-small" type="button" onClick={() => previewTimer.status === 'running' ? dispatchPreviewTimer({ type: 'pause', nowMs: performance.now() }) : resetPreview()}>
+                          {previewTimer.status === 'running' ? 'Pause' : 'Start over'}
                         </button>
                       )}
                     </div>
@@ -319,7 +304,7 @@ function App() {
               <div className="stage-layout privacy-layout">
                 <div className="stage-copy">
                   <p className="eyebrow">02 / PRIVACY</p>
-                  <h2>Know what happens<br />before you choose.</h2>
+                  <h2 tabIndex={-1}>Know what happens<br />before you choose.</h2>
                   <p className="body-copy">This is a front-end prototype with no account, analytics, AI, microphone, notification or partner-invitation service connected.</p>
                   <div className="prototype-notice"><span className="status-dot" /> Prototype status · no app backend connected</div>
                   <p className="fine-print">The website host may receive standard connection data when this page loads. A production privacy notice must describe its actual infrastructure and retention practices.</p>
@@ -366,7 +351,7 @@ function App() {
               <div className="stage-layout connection-layout">
                 <div className="stage-copy">
                   <p className="eyebrow">03 / YOUR CHOICE</p>
-                  <h2>Keep it yours.<br />Invite only if you want.</h2>
+                  <h2 tabIndex={-1}>Keep it yours.<br />Invite only if you want.</h2>
                   <p className="body-copy">Solo is a complete way to use gME2—not a preview. Your preferences and activity are never included in an invitation.</p>
                   <div className="choice-cards">
                     <button className="choice-card solo-choice" type="button" onClick={enterSolo}>
@@ -432,7 +417,7 @@ function App() {
       ) : screen === 'solo' ? (
         <section className="solo-screen" aria-labelledby="solo-heading">
           <div className="solo-heading-row">
-            <div><p className="eyebrow"><span /> SOLO SPACE</p><h1 id="solo-heading">A moment, <em>for you.</em></h1></div>
+            <div><p className="eyebrow"><span /> SOLO SPACE</p><h1 id="solo-heading" ref={soloHeadingRef} tabIndex={-1}>A moment, <em>for you.</em></h1></div>
             <button className="button button-quiet" type="button" onClick={() => {
               pauseActiveTimers()
               setScreen('onboarding')
@@ -443,17 +428,17 @@ function App() {
               <p className="card-kicker">YOUR CARD LIBRARY</p><h2 id="library-title">Choose what feels right.</h2>
               <div className="solo-card-list" role="group" aria-label="Solo cards">
                 {soloCards.map((card, index) => (
-                  <button className={`solo-library-card ${selectedCardId === card.id ? 'selected' : ''}`} type="button" key={card.id} aria-pressed={selectedCardId === card.id} disabled={soloStatus === 'running'} onClick={() => selectSoloCard(card.id)}>
+                  <button className={`solo-library-card ${selectedCardId === card.id ? 'selected' : ''}`} type="button" key={card.id} aria-pressed={selectedCardId === card.id} disabled={soloTimer.status === 'running'} onClick={() => selectSoloCard(card.id)}>
                     <span className="library-card-index">0{index + 1}</span><span className="library-card-copy"><strong>{card.title}</strong><small>{card.description}</small></span><span className="library-card-time">{card.duration} MIN</span>
                   </button>
                 ))}
               </div>
-              {soloStatus === 'running' && <p className="fine-print library-note">Pause the timer before choosing a different card.</p>}
+              {soloTimer.status === 'running' && <p className="fine-print library-note">Pause the timer before choosing a different card.</p>}
               <div className="solo-guidance"><p className="card-kicker">A GENTLE PROMPT</p><p>{personalizationEnabled ? selectedCard.shortPrompt : selectedCard.prompt}</p></div>
             </section>
             <section className="solo-timer-panel" aria-label="Guided timer">
-              {soloStatus === 'complete' ? (
-                <div className="completion-state">
+              {soloTimer.status === 'complete' ? (
+                <div className="completion-state" role="status">
                   <span className="completion-symbol" aria-hidden="true">✳</span><p className="card-kicker">SESSION COMPLETE</p><h2>Thank yourself<br />for showing up.</h2>
                   <p className="body-copy">That moment was yours. Nothing in this prototype was saved.</p>
                   <p className="card-kicker reflection-label">OPTIONAL CHECK-IN</p>
@@ -464,20 +449,22 @@ function App() {
                 </div>
               ) : (
                 <>
-                  <p className="card-kicker">{soloStatus === 'paused' ? 'PAUSED · TAKE YOUR TIME' : 'GO AT YOUR OWN PACE'}</p>
+                  <p className="card-kicker">{soloTimer.status === 'paused' ? 'PAUSED · TAKE YOUR TIME' : 'GO AT YOUR OWN PACE'}</p>
                   <div className="solo-countdown" aria-label={`Time remaining ${formatTime(soloSeconds)}`}>{formatTime(soloSeconds)}</div>
                   <p className="solo-timer-label">{selectedCard.duration} minute{selectedCard.duration === 1 ? '' : 's'} · {selectedCard.title}</p>
                   <div className="timer-progress" role="progressbar" aria-label="Session progress" aria-valuemin={0} aria-valuemax={selectedCard.duration * 60} aria-valuenow={selectedCard.duration * 60 - soloSeconds}>
                     <span style={{ width: `${((selectedCard.duration * 60 - soloSeconds) / (selectedCard.duration * 60)) * 100}%` }} />
                   </div>
                   <div className="solo-control-row">
-                    <button className="button button-primary" type="button" onClick={() => setSoloStatus(soloStatus === 'running' ? 'paused' : 'running')}>{soloStatus === 'running' ? 'Pause' : soloStatus === 'paused' ? 'Resume' : 'Begin session'}</button>
-                    <button className="button button-outline" type="button" disabled={soloStatus === 'idle'} onClick={() => {
-                      setSoloStatus('idle')
-                      setSoloSeconds(selectedCard.duration * 60)
+                    <button className="button button-primary" type="button" onClick={() => {
+                      if (soloTimer.status === 'running') dispatchSoloTimer({ type: 'pause', nowMs: performance.now() })
+                      else dispatchSoloTimer({ type: soloTimer.status === 'paused' ? 'resume' : 'start', nowMs: performance.now() })
+                    }}>{soloTimer.status === 'running' ? 'Pause' : soloTimer.status === 'paused' ? 'Resume' : 'Begin session'}</button>
+                    <button className="button button-outline" type="button" disabled={soloTimer.status === 'idle'} onClick={() => {
+                      dispatchSoloTimer({ type: 'stop' })
                       setNotice('Session stopped. You can begin again whenever you like.')
                     }}>Stop</button>
-                    <button className="button button-quiet" type="button" disabled={soloStatus === 'idle'} onClick={() => {
+                    <button className="button button-quiet" type="button" disabled={soloTimer.status === 'idle'} onClick={() => {
                       const currentIndex = soloCards.findIndex((card) => card.id === selectedCardId)
                       selectSoloCard(soloCards[(currentIndex + 1) % soloCards.length].id)
                     }}>Skip</button>
@@ -494,7 +481,7 @@ function App() {
         </section>
       ) : null}
 
-      <ChallengeHub hidden={screen !== 'challenges'} onExit={exitChallenges} />
+      <ChallengeHub hidden={screen !== 'challenges'} onExit={exitChallenges} onEnterSolo={enterSolo} />
 
       {notice && <p className="toast" role="status">{notice}<button type="button" aria-label="Dismiss notification" onClick={() => setNotice('')}>×</button></p>}
 

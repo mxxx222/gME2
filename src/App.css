@@ -1,10 +1,12 @@
 .app-shell { width: min(1120px, 100%); min-height: 100vh; margin: 0 auto; padding: 0 56px; }
 .topbar { height: 78px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
-.wordmark { color: var(--cream); text-decoration: none; font-size: 22px; font-weight: 700; letter-spacing: -1.5px; }
+.wordmark { padding: 0; border: 0; background: transparent; color: var(--cream); font-size: 22px; font-weight: 700; letter-spacing: -1.5px; cursor: pointer; }
+.wordmark:focus-visible { outline: 2px solid var(--lilac); outline-offset: 4px; }
 .wordmark-mark { color: var(--lilac); }
 .wordmark-two { color: var(--muted); font-size: 13px; vertical-align: top; margin-left: 2px; }
 .topbar-right { display: flex; align-items: center; gap: 14px; color: var(--muted); font: 10px var(--mono); letter-spacing: .13em; }
 .topbar-caption { letter-spacing: .16em; }
+.primary-navigation { display: flex; align-items: center; gap: 6px; }
 .age-chip { padding: 5px 8px; border: 1px solid #ffffff30; border-radius: 4px; color: var(--cream); }
 .intro { display: flex; align-items: end; justify-content: space-between; gap: 50px; padding: 52px 0 35px; }
 .eyebrow { display: flex; align-items: center; gap: 10px; margin: 0 0 18px; color: var(--lilac); font: 10px var(--mono); letter-spacing: .16em; }
@@ -54,16 +56,17 @@
 .stage-actions > .fine-print { max-width: 410px; margin: 0; }
 .stage-actions .age-required-hint { flex: 1 0 100%; margin: -12px 0 0; text-align: right; }
 .button-row, .invite-buttons { display: flex; align-items: center; gap: 9px; }
-.button { min-height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 12px; padding: 0 17px; border: 1px solid transparent; border-radius: 4px; color: var(--cream); font-size: 11px; font-weight: 550; cursor: pointer; transition: background .18s, border-color .18s, color .18s; }
+.button { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 12px; padding: 0 17px; border: 1px solid transparent; border-radius: 4px; color: var(--cream); font-size: 11px; font-weight: 550; cursor: pointer; transition: background .18s, border-color .18s, color .18s; }
 .button-primary { border-color: var(--lilac); background: var(--lilac); color: #201a26; }
 .button-primary:hover:not(:disabled) { border-color: #e4d0ff; background: #e4d0ff; }
 .button-quiet { border-color: transparent; background: transparent; color: #b8b0bc; }
 .button-quiet:hover:not(:disabled) { background: #ffffff0d; color: var(--cream); }
 .button-outline { border-color: #ffffff36; background: transparent; color: var(--cream); }
 .button-outline:hover:not(:disabled) { border-color: var(--lilac); color: var(--lilac); }
-.button-small { min-height: 34px; padding: 0 12px; font-size: 10px; }
+.button-small { min-height: 44px; padding: 0 12px; font-size: 10px; }
 .button:disabled { opacity: .38; cursor: not-allowed; }
 .button:focus-visible, .choice-card:focus-visible, .solo-library-card:focus-visible, .reflection-chip:focus-visible, summary:focus-visible, .footer button:focus-visible { outline: 2px solid var(--lilac); outline-offset: 3px; }
+.topbar-action[aria-current="page"] { border-color: #d7b9ff80; background: #d7b9ff1c; color: var(--cream); }
 .prototype-notice { display: inline-flex; align-items: center; gap: 9px; margin-top: 21px; padding: 10px 12px; border: 1px solid #d7b9ff28; border-radius: 4px; color: #d4c8df; font-size: 10px; }
 .prototype-notice .status-dot { width: 6px; height: 6px; }
 .privacy-layout { grid-template-columns: minmax(0, .78fr) minmax(0, 1.22fr); }
@@ -181,7 +184,10 @@
 @media (max-width: 480px) {
   .app-shell { padding: 0 18px; }
   .topbar { height: 66px; }
-  .topbar-caption { max-width: 145px; font-size: 8px; text-align: right; }
+  .topbar-right { gap: 7px; }
+  .topbar-caption { display: none; }
+  .primary-navigation { gap: 3px; }
+  .topbar-action { min-height: 40px; padding: 0 8px; font-size: 9px; }
   .intro h1 { font-size: 43px; }
   .step { min-height: 51px; gap: 7px; font-size: 10px; }
   .step + .step { padding-left: 9px; }

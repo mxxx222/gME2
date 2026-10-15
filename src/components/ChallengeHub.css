@@ -1,4 +1,4 @@
-.topbar-action { min-height: 34px; padding: 0 11px; border: 1px solid #d7b9ff38; border-radius: 4px; background: #d7b9ff0b; color: #d7b9ff; font-size: 10px; cursor: pointer; }
+.topbar-action { min-height: 44px; padding: 0 11px; border: 1px solid #d7b9ff38; border-radius: 4px; background: #d7b9ff0b; color: #d7b9ff; font-size: 10px; cursor: pointer; }
 .topbar-action:hover { border-color: #d7b9ff80; background: #d7b9ff16; }
 .topbar-action:focus-visible { outline: 2px solid var(--lilac); outline-offset: 3px; }
 .challenge-screen { padding: 42px 0 35px; }
@@ -59,7 +59,7 @@
 .activity-progress { height: 3px; margin: 17px 0 24px; overflow: hidden; border-radius: 2px; background: #ffffff1c; }
 .activity-progress span { display: block; height: 100%; background: var(--lilac); transition: width .2s ease; }
 .activity-picker { display: flex; flex-wrap: wrap; gap: 7px; margin: 0 0 20px; }
-.activity-picker-button { display: grid; width: 33px; height: 33px; place-items: center; border: 1px solid #ffffff2a; border-radius: 50%; background: transparent; color: #b6adb9; font-size: 10px; cursor: pointer; }
+.activity-picker-button { display: grid; width: 44px; height: 44px; place-items: center; border: 1px solid #ffffff2a; border-radius: 50%; background: transparent; color: #b6adb9; font-size: 10px; cursor: pointer; }
 .activity-picker-button:hover, .activity-picker-button.selected { border-color: var(--lilac); color: var(--lilac); }
 .activity-picker-button.completed { border-color: #b8dfca75; color: var(--mint); }
 .activity-picker-button.completed.selected { border-color: var(--lilac); color: var(--lilac); }
@@ -71,6 +71,7 @@
 .activity-reflection .card-kicker { margin-bottom: 8px; color: #b8a7c4; }
 .activity-reflection > p:not(.card-kicker):not(.fine-print) { margin: 0; color: #ddd5e1; font-size: 11px; }
 .activity-reflection .reflection-choices { justify-content: flex-start; margin: 12px 0 0; }
+.reflection-chip { min-height: 44px; }
 .activity-reflection .fine-print { margin-top: 10px; }
 .activity-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
 .activity-safety { align-self: start; padding: 20px; }
@@ -147,7 +148,7 @@
 }
 
 @media (max-width: 480px) {
-  .topbar-action { min-height: 31px; padding: 0 8px; font-size: 9px; }
+  .topbar-action { min-height: 40px; padding: 0 8px; font-size: 9px; }
   .challenge-screen { padding-top: 28px; }
   .challenge-page-heading h1 { font-size: 42px; }
   .challenge-stepper .step { align-items: flex-start; flex-direction: column; justify-content: center; gap: 2px; min-height: 56px; font-size: 8px; }

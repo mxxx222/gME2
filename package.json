@@ -5,17 +5,29 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "npm run build:server && tsc -b && vite build",
+    "build:server": "tsc -p tsconfig.server.json --noEmit false",
+    "typecheck:server": "tsc -p tsconfig.server.json --noEmit",
+    "start:server": "node --env-file=.env dist-server/server/main.js",
+    "db:migrate": "node --env-file-if-exists=.env ./node_modules/node-pg-migrate/bin/node-pg-migrate.js up --migrations-dir server/db/migrations",
+    "db:migrate:down": "node --env-file-if-exists=.env ./node_modules/node-pg-migrate/bin/node-pg-migrate.js down --migrations-dir server/db/migrations",
+    "db:migration:create": "node --env-file-if-exists=.env ./node_modules/node-pg-migrate/bin/node-pg-migrate.js create --migration-file-language sql --migrations-dir server/db/migrations",
     "lint": "oxlint",
-    "test": "node --test",
+    "test": "node --test test/*.test.mjs",
+    "test:server": "node --test test/server/*.test.mjs",
+    "test:db": "node --env-file-if-exists=.env --test test/integration/postgres.integration.test.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
+    "fastify": "^5.12.7",
+    "node-pg-migrate": "^9.0.0",
+    "pg": "^8.23.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
   "devDependencies": {
     "@types/node": "^24.13.3",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
