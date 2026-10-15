@@ -1,14 +1,22 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#101112" />
-    <meta name="description" content="Edging Tease & Control — Browser-based edging tutorial for couples" />
-    <title>Edging Tease & Control</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CoupleEdger — Edging Game for Couples</title>
+  <meta name="description" content="An 18+ NSFW PWA for couples exploring edging together.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' ws: https:; font-src 'self';">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="/src/index.css" />
+  <script>
+    // Bouncer: redirect to age gate if not verified
+    if (!localStorage.getItem('couple-edger-age-verified')) {
+      window.location.href = '/age-gate.html';
+    }
+  </script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
 </html>

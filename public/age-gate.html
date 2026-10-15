@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Age Verification — CoupleEdger</title>
+  <meta name="description" content="Age verification for CoupleEdger — an 18+ NSFW intimacy app for couples.">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+  <link rel="stylesheet" href="/src/index.css" />
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #000;
+      color: #fff;
+      font-family: "Courier New", Courier, monospace;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .gate-container {
+      max-width: 420px;
+      width: 90%;
+      padding: 40px 24px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+    }
+    .gate-container h1 { font-size: 1.2rem; letter-spacing: 2px; }
+    .gate-container p { font-size: 0.9rem; opacity: 0.8; margin: 16px 0; }
+    input[type="number"] {
+      width: 90px;
+      padding: 10px 12px;
+      font-size: 1rem;
+      text-align: center;
+      background: #111;
+      border: 1px solid #444;
+      border-radius: 6px;
+      color: #fff;
+    }
+    .checkbox-row {
+      margin: 16px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    button#enter {
+      padding: 12px 32px;
+      font-size: 1rem;
+      font-weight: bold;
+      background: #fff;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    button#enter:hover { background: #e0e0e0; }
+    button#enter:active { transform: scale(0.98); }
+    .warning {
+      font-size: 0.75rem;
+      opacity: 0.5;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="gate-container">
+    <h1>AGE VERIFICATION</h1>
+    <p>This application contains sexually explicit content for adults 18+ only.</p>
+    <p>By entering, you confirm you are legally an adult in your jurisdiction.</p>
+
+    <p>Birth year:</p>
+    <input type="number" id="year" min="1900" max="2026" placeholder="YYYY" />
+
+    <div class="checkbox-row">
+      <input type="checkbox" id="consent" />
+      <label for="consent">I am 18+ and consent to view adult content</label>
+    </div>
+
+    <button id="enter">Enter</button>
+
+    <p class="warning">⚠ All content is for consenting adults. RACK &amp; SSC principles apply. No illegal content. No non-consensual material.</p>
+  </div>
+
+  <script>
+    document.getElementById("enter").onclick = function() {
+      const year = parseInt(document.getElementById("year").value, 10);
+      const consent = document.getElementById("consent").checked;
+      const now = new Date().getFullYear();
+
+      if (!consent) {
+        alert("You must confirm consent to proceed.");
+        return;
+      }
+      if (!year || (now - year) < 18) {
+        alert("You must be 18 or older to enter.");
+        return;
+      }
+
+      localStorage.setItem("couple-edger-age-verified", "true");
+      window.location.href = "/?from=gated";
+    };
+
+    document.getElementById("year").addEventListener("keypress", (e) => {
+      if (e.key === "Enter") document.getElementById("enter").click();
+    });
+  </script>
+</body>
+</html>

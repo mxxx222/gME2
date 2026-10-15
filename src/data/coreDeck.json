@@ -1,0 +1,765 @@
+[
+  {
+    "id": "level-1-connect-inner-thighs",
+    "type": "EDGE",
+    "intensity": 1,
+    "sensateLevel": 1,
+    "name": "Inner Thighs",
+    "zoneTags": [
+      "INNER_THIGHS"
+    ],
+    "sensationTags": [
+      "LIGHT_TOUCH",
+      "GENTLE_PRESSURE"
+    ],
+    "paceTags": [
+      "SLOW",
+      "VARIABLE"
+    ],
+    "text": "Let your partner explore the inner curve of your thighs. No goal, no rush — just notice how sensation builds when you stop trying to reach it.",
+    "receiverRole": "both",
+    "duration": {
+      "min": 120,
+      "max": 180
+    },
+    "languageOptions": {
+      "anatomical": "Inner thighs",
+      "custom": true
+    },
+    "inclusion": "ask",
+    "comfortChecks": [
+      "comfortable",
+      "reduce_intensity",
+      "pause",
+      "stop"
+    ]
+  },
+  {
+    "id": "zone-02-perineum",
+    "type": "EDGE",
+    "intensity": 3,
+    "sensateLevel": 4,
+    "name": "Perineum",
+    "zoneTags": [
+      "PERINEUM"
+    ],
+    "sensationTags": [
+      "LIGHT_TOUCH",
+      "PRESSURE",
+      "STILLNESS"
+    ],
+    "paceTags": [
+      "SLOW",
+      "PAUSE"
+    ],
+    "text": "This is the area between your genitals and anus. If you want this zone included, tell me. If not — we skip it entirely.",
+    "receiverRole": "receiver",
+    "duration": {
+      "min": 60,
+      "max": 120
+    },
+    "languageOptions": {
+      "anatomical": "Perineum",
+      "custom": true
+    },
+    "inclusion": "ask",
+    "comfortChecks": [
+      "comfortable",
+      "reduce_intensity",
+      "pause",
+      "stop"
+    ],
+    "requiresConfirmation": true
+  },
+  {
+    "id": "zone-03-neck",
+    "type": "TEASE",
+    "intensity": 2,
+    "sensateLevel": 2,
+    "name": "Neck",
+    "zoneTags": [
+      "NECK"
+    ],
+    "sensationTags": [
+      "LIGHT_TOUCH",
+      "WARMTH"
+    ],
+    "paceTags": [
+      "SLOW",
+      "VARIABLE"
+    ],
+    "text": "Trace slow patterns down the center of their neck. Each stroke lighter than the last. They'll be listening for your breath.",
+    "receiverRole": "giver",
+    "duration": {
+      "min": 90,
+      "max": 150
+    },
+    "languageOptions": {
+      "anatomical": "Neck",
+      "custom": true
+    },
+    "inclusion": "auto",
+    "comfortChecks": [
+      "comfortable",
+      "reduce_intensity",
+      "pause"
+    ]
+  },
+  {
+    "id": "zone-04-scalp",
+    "type": "TEASE",
+    "intensity": 1,
+    "sensateLevel": 2,
+    "name": "Scalp",
+    "zoneTags": [
+      "SCALP"
+    ],
+    "sensationTags": [
+      "LIGHT_TOUCH",
+      "RHYTHMIC"
+    ],
+    "paceTags": [
+      "SLOW",
+      "STEADY"
+    ],
+    "text": "Brush your fingertips along their hairline. Firm enough they feel you, gentle enough they forget nothing else exists.",
+    "receiverRole": "both",
+    "duration": {
+      "min": 60,
+      "max": 90
+    },
+    "languageOptions": {
+      "anatomical": "Scalp / Hairline",
+      "custom": true
+    },
+    "inclusion": "auto",
+    "comfortChecks": [
+      "comfortable",
+      "reduce_intensity"
+    ]
+  },
+  {
+    "id": "zone-05-breast-tissue",
+    "type": "TEASE",
+    "intensity": 4,
+    "sensateLevel": 4,
+    "name": "Chest & Breast Tissue",
+    "zoneTags": [
+      "BREAST_TISSUE"
+    ],
+    "sensationTags": [
+      "LIGHT_TOUCH",
+      "WARMTH",
+      "PRESSURE"
+    ],
+    "paceTags": [
+      "SLOW",
+      "VARIABLE"
+    ],
+    "text": "Map every curve. Nipples, collarbones, the hollow of their throat — let your hands memorize the geography of their skin.",
+    "receiverRole": "both",
+    "duration": {
+      "min": 120,
+      "max": 180
+    },
+    "languageOptions": {
+      "anatomical": "Chest / Breast tissue",
+      "custom": true
+    },
+    "inclusion": "ask",
+    "comfortChecks": [
+      "comfortable",
+      "reduce_intensity",
+      "pause",
+      "change_zone"
+    ],
+    "requiresConfirmation": true
+  },
+  {
+    "id": "zone-06-custom",
+    "type": "TEASE",
+    "intensity": 2,
+    "sensateLevel": 5,
+    "name": "Your Choice",
+    "zoneTags": [
+      "CUSTOM_ZONE"
+    ],
+    "sensationTags": [
+      "USER_DEFINED"
+    ],
+    "paceTags": [
+      "USER_DEFINED"
+    ],
+    "text": "You choose the zone, the sensation, the pace. This is your moment to be fully known.",
+    "receiverRole": "both",
+    "duration": {
+      "min": 90,
+      "max": 150
+    },
+    "languageOptions": {
+      "custom": true
+    },
+    "inclusion": "always",
+    "comfortChecks": [
+      "comfortable",
+      "reduce_intensity",
+      "pause",
+      "change_zone"
+    ]
+  },
+  {
+    "id": "command-01-consent-first",
+    "type": "COMMAND",
+    "intensity": 1,
+    "sensateLevel": 1,
+    "name": "Consent Check",
+    "zoneTags": [],
+    "sensationTags": [],
+    "paceTags": [],
+    "text": "Before we begin: what do you need right now? A slower pace, a different touch, or to stop entirely? Your answer guides everything.",
+    "receiverRole": "both",
+    "duration": {
+      "min": 30,
+      "max": 60
+    },
+    "languageOptions": {
+      "anatomical": "Communication",
+      "custom": true
+    },
+    "inclusion": "always",
+    "comfortChecks": [
+      "continue",
+      "adjust",
+      "pause",
+      "stop"
+    ],
+    "safety": true
+  },
+  {
+    "id": "command-02-breath-sync",
+    "type": "COMMAND",
+    "intensity": 2,
+    "sensateLevel": 3,
+    "name": "Breath & Touch",
+    "zoneTags": [
+      "INNER_THIGHS",
+      "NECK"
+    ],
+    "sensationTags": [
+      "LIGHT_TOUCH",
+      "GENTLE_PRESSURE"
+    ],
+    "paceTags": [
+      "SLOW",
+      "SYNC_WITH_BREATH"
+    ],
+    "text": "Match each stroke to one breath. Inhale for the stroke, exhale for the pause. Let breath be your metronome — slow down if it quickens.",
+    "receiverRole": "both",
+    "duration": {
+      "min": 120,
+      "max": 180
+    },
+    "languageOptions": {
+      "anatomical": "Anywhere comfortable",
+      "custom": true
+    },
+    "inclusion": "auto",
+    "comfortChecks": [
+      "comfortable",
+      "reduce_intensity",
+      "pause",
+      "adjust_breath"
+    ]
+  },
+  {
+    "id": "punish-01-slow-down",
+    "type": "PUNISHMENT",
+    "intensity": 1,
+    "name": "Slow Down",
+    "zoneTags": [],
+    "sensationTags": [],
+    "paceTags": [
+      "STOP",
+      "BREATHE"
+    ],
+    "text": "You rushed that. Hands still. Close your eyes. Breathe with me for 30 seconds — just notice how that feels.",
+    "receiverRole": "receiver",
+    "duration": {
+      "min": 30,
+      "max": 30
+    },
+    "languageOptions": {
+      "anatomical": "Pause and reset",
+      "custom": true
+    },
+    "inclusion": "auto",
+    "comfortChecks": [
+      "comfortable",
+      "stop"
+    ],
+    "sensateLevel": 3
+  },
+  {
+    "id": "punish-02-name-it",
+    "type": "PUNISHMENT",
+    "intensity": 2,
+    "name": "Name Three Things",
+    "zoneTags": [],
+    "sensationTags": [],
+    "paceTags": [
+      "VERBAL",
+      "SLOW"
+    ],
+    "text": "Tell me three things you love about this moment. Don't rush — I want to hear each one clearly.",
+    "receiverRole": "receiver",
+    "duration": {
+      "min": 45,
+      "max": 60
+    },
+    "languageOptions": {
+      "anatomical": "Verbal reflection",
+      "custom": true
+    },
+    "inclusion": "auto",
+    "comfortChecks": [
+      "comfortable",
+      "pause"
+    ],
+    "sensateLevel": 3
+  },
+  {
+    "id": "reward-01-choice",
+    "type": "REWARD",
+    "intensity": 1,
+    "name": "Your Choice",
+    "zoneTags": [],
+    "sensationTags": [],
+    "paceTags": [],
+    "text": "You've earned a choice: where do you want my hands? What do you need to feel right now?",
+    "receiverRole": "both",
+    "duration": {
+      "min": 30,
+      "max": 45
+    },
+    "languageOptions": {
+      "anatomical": "Choice and empowerment",
+      "custom": true
+    },
+    "inclusion": "always",
+    "comfortChecks": [
+      "all_good"
+    ],
+    "sensateLevel": 3
+  },
+  {
+    "id": "reward-02-earned-release",
+    "type": "REWARD",
+    "intensity": 3,
+    "name": "Permission & Time",
+    "zoneTags": [],
+    "sensationTags": [
+      "USER_SELECTED"
+    ],
+    "paceTags": [
+      "USER_PACED"
+    ],
+    "text": "You can finish — but only because you chose to push this far. Take the time you need. I'll be right here.",
+    "receiverRole": "receiver",
+    "duration": {
+      "min": 60,
+      "max": 180
+    },
+    "languageOptions": {
+      "anatomical": "Permission granted",
+      "custom": true
+    },
+    "inclusion": "conditional",
+    "comfortChecks": [
+      "continue",
+      "slow_down",
+      "pause"
+    ],
+    "sensateLevel": 3
+  },
+  {
+    "id": "wildcard-01-swap",
+    "type": "WILDCARD",
+    "intensity": 2,
+    "name": "Role Swap",
+    "zoneTags": [],
+    "sensationTags": [],
+    "paceTags": [],
+    "text": "Switch roles for this cycle. You've been so good at receiving — now show me how you give.",
+    "receiverRole": "both",
+    "duration": {
+      "min": 60,
+      "max": 120
+    },
+    "languageOptions": {
+      "anatomical": "Role reversal",
+      "custom": true
+    },
+    "inclusion": "conditional",
+    "switchesRoles": true,
+    "sensateLevel": 3
+  },
+  {
+    "id": "wildcard-02-blindfold",
+    "type": "WILDCARD",
+    "intensity": 4,
+    "name": "Sensory Shift",
+    "zoneTags": [],
+    "sensationTags": [
+      "TACTILE",
+      "TEMPERATURE"
+    ],
+    "paceTags": [
+      "SLOW",
+      "SURPRISE"
+    ],
+    "text": "A scarf over the eyes. Suddenly every touch is new. Your other senses have to work harder to map where I am.",
+    "receiverRole": "receiver",
+    "duration": {
+      "min": 120,
+      "max": 240
+    },
+    "languageOptions": {
+      "anatomical": "Sensory challenge",
+      "custom": true
+    },
+    "inclusion": "ask",
+    "requiresConfirmation": true,
+    "comfortChecks": [
+      "comfortable",
+      "reduce_intensity",
+      "pause",
+      "remove"
+    ],
+    "sensateLevel": 4
+  },
+  {
+    "id": "wildcard-03-whisper",
+    "type": "WILDCARD",
+    "intensity": 3,
+    "name": "Voice Only",
+    "zoneTags": [],
+    "sensationTags": [
+      "AUDITORY"
+    ],
+    "paceTags": [
+      "SLOW",
+      "VERBAL"
+    ],
+    "text": "I'm going to whisper exactly what I want to do to you. Each word closer to your ear than the last. Tell me how that feels.",
+    "receiverRole": "both",
+    "duration": {
+      "min": 90,
+      "max": 150
+    },
+    "languageOptions": {
+      "anatomical": "Auditory exploration",
+      "custom": true
+    },
+    "inclusion": "auto",
+    "comfortChecks": [
+      "comfortable",
+      "reduce_intensity",
+      "pause"
+    ],
+    "sensateLevel": 3
+  },
+  {
+    "id": "wildcard-04-temperature",
+    "type": "WILDCARD",
+    "intensity": 5,
+    "name": "Temperature Play",
+    "zoneTags": [
+      "INNER_THIGHS",
+      "NECK",
+      "WRISTS",
+      "ARMPITS"
+    ],
+    "sensationTags": [
+      "TEMPERATURE",
+      "PRESSURE"
+    ],
+    "paceTags": [
+      "SLOW",
+      "VARIABLE"
+    ],
+    "text": "Ice cube in one hand, warm cloth in the other. I'll let you decide where each one traces. Start slow — let contrast tell the story.",
+    "receiverRole": "both",
+    "duration": {
+      "min": 90,
+      "max": 180
+    },
+    "languageOptions": {
+      "anatomical": "Temperature contrast",
+      "custom": true
+    },
+    "inclusion": "ask",
+    "requiresConfirmation": true,
+    "comfortChecks": [
+      "too_cold",
+      "too_hot",
+      "just_right",
+      "stop"
+    ],
+    "sensateLevel": 5
+  },
+  {
+    "id": "wildcard-05-pressure-map",
+    "type": "WILDCARD",
+    "intensity": 4,
+    "name": "Pressure Mapping",
+    "zoneTags": [],
+    "sensationTags": [
+      "PRESSURE",
+      "LIGHT_TOUCH"
+    ],
+    "paceTags": [
+      "SLOW",
+      "STEADY"
+    ],
+    "text": "I'm going to map your entire body with pressure. Firm where you're tense, light where you're sensitive. Breathe through it.",
+    "receiverRole": "both",
+    "duration": {
+      "min": 180,
+      "max": 300
+    },
+    "languageOptions": {
+      "anatomical": "Full-body mapping",
+      "custom": true
+    },
+    "inclusion": "always",
+    "comfortChecks": [
+      "comfortable",
+      "too_much",
+      "reduce_intensity",
+      "pause",
+      "stop"
+    ],
+    "sensateLevel": 4
+  },
+  {
+    "id": "wildcard-06-sensory-deprivation",
+    "type": "WILDCARD",
+    "intensity": 5,
+    "name": "Deprivation",
+    "zoneTags": [],
+    "sensationTags": [
+      "LIGHT_TOUCH",
+      "PRESSURE"
+    ],
+    "paceTags": [
+      "SLOW",
+      "STILLNESS"
+    ],
+    "text": "Eyes closed. Hands behind your head. I have all the control. Every touch is a question — will you break, or will you serve?",
+    "receiverRole": "receiver",
+    "duration": {
+      "min": 120,
+      "max": 300
+    },
+    "languageOptions": {
+      "anatomical": "Sensory challenge",
+      "custom": true
+    },
+    "inclusion": "ask",
+    "requiresConfirmation": true,
+    "comfortChecks": [
+      "yellow",
+      "red",
+      "beg",
+      "submit"
+    ],
+    "sensateLevel": 5
+  },
+  {
+    "id": "level-5-brink-walk",
+    "type": "EDGE",
+    "intensity": 4,
+    "sensateLevel": 5,
+    "name": "Brink Walk",
+    "zoneTags": [],
+    "sensationTags": [
+      "PRESSURE",
+      "RHYTHMIC"
+    ],
+    "paceTags": [
+      "SLOW",
+      "VARIABLE"
+    ],
+    "text": "You're close. I'm going to edge you — approach that feeling, then pull back. We'll do this three times. On the third, you decide if you're ready to finish or if I take control.",
+    "receiverRole": "giver",
+    "duration": {
+      "min": 180,
+      "max": 300
+    },
+    "languageOptions": {
+      "anatomical": "Controlled edging",
+      "custom": true
+    },
+    "inclusion": "ask",
+    "requiresConfirmation": true,
+    "comfortChecks": [
+      "edge_now",
+      "pull_back",
+      "too_close",
+      "release"
+    ],
+    "edgeTarget": 3
+  },
+  {
+    "id": "level-5-choice-finish",
+    "type": "REWARD",
+    "intensity": 5,
+    "sensateLevel": 5,
+    "name": "Your Decision",
+    "zoneTags": [],
+    "sensationTags": [
+      "USER_SELECTED"
+    ],
+    "paceTags": [
+      "USER_PACED"
+    ],
+    "text": "Three edges completed. The choice is yours: come now, or let me take you higher. Tell me what you need.",
+    "receiverRole": "both",
+    "duration": {
+      "min": 30,
+      "max": 120
+    },
+    "languageOptions": {
+      "anatomical": "Choice point",
+      "custom": true
+    },
+    "inclusion": "always",
+    "comfortChecks": ["finish_now","edge_more","ruin","stop"]
+  },
+  {
+    "id": "multi-peak-01-recognize",
+    "type": "EDGE",
+    "intensity": 2,
+    "sensateLevel": 5,
+    "multiPeakType": "RECOGNIZE_EDGE",
+    "name": "Recognize the Edge",
+    "zoneTags": [],
+    "sensationTags": ["PRESSURE", "BREATH"],
+    "paceTags": ["SLOW", "VARIABLE"],
+    "text": "Choose a comfortable pace. Notice changes in sensation, breathing and muscular tension. Is your arousal still comfortable? Can you pause without feeling compelled to continue? Are you noticing tension in your pelvic floor?",
+    "receiverRole": "both",
+    "duration": { "min": 180, "max": 180 },
+    "languageOptions": {
+      "anatomical": "Arousal awareness",
+      "custom": true
+    },
+    "inclusion": "always",
+    "comfortChecks": ["continue", "pause_reset", "finish"],
+    "multiPeakPhases": [
+      { "name": "BUILD", "durationSeconds": 120, "objective": "Notice arousal changes" },
+      { "name": "CHECK_IN", "durationSeconds": 30, "objective": "Self-assess comfort" },
+      { "name": "DECIDE", "durationSeconds": 30, "objective": "Choose next action" }
+    ]
+  },
+  {
+    "id": "multi-peak-02-contract-release",
+    "type": "TEASE",
+    "intensity": 2,
+    "sensateLevel": 5,
+    "multiPeakType": "PC_CONTRACT_RELEASE",
+    "name": "PC Control: Contract & Release",
+    "zoneTags": [],
+    "sensationTags": ["PRESSURE", "BREATH"],
+    "paceTags": ["SLOW", "STEADY"],
+    "text": "If comfortable, make a light pelvic-floor contraction for 3-5 seconds. Do not strain or hold breath. Then release fully for 10-15 seconds. Let muscles soften. Breathe normally. Notice whether contraction, relaxation, or neither feels helpful.",
+    "receiverRole": "both",
+    "duration": { "min": 120, "max": 120 },
+    "languageOptions": {
+      "anatomical": "Pelvic floor awareness",
+      "custom": true
+    },
+    "inclusion": "ask",
+    "requiresConfirmation": false,
+    "comfortChecks": ["gentle_contract", "full_release", "skip", "stop"],
+    "safety": true,
+    "safetyNote": "Stop if pelvic pain, cramping, or increasing tension. Not proven to prevent ejaculation.",
+    "multiPeakPhases": [
+      { "name": "CONTRACT", "durationSeconds": 5, "objective": "Gentle pelvic floor lift", "pcMuscleCue": "GENTLE_CONTRACT" },
+      { "name": "RELEASE", "durationSeconds": 15, "objective": "Full relaxation", "pcMuscleCue": "RELEASE" },
+      { "name": "CHECK_IN", "durationSeconds": 30, "objective": "Compare contraction vs release", "pcMuscleCue": "NONE" }
+    ]
+  },
+  {
+    "id": "multi-peak-03-edge-reset",
+    "type": "EDGE",
+    "intensity": 3,
+    "sensateLevel": 5,
+    "multiPeakType": "EDGE_RESET",
+    "name": "Edge & Reset",
+    "zoneTags": [],
+    "sensationTags": ["PRESSURE", "BREATH", "RHYTHMIC"],
+    "paceTags": ["SLOW", "VARIABLE"],
+    "text": "Use a comfortable pace. Pay attention to how quickly arousal changes. Then pause completely — stop stimulation, relax jaw, abdomen, and pelvic floor. Breathe naturally. Reassess: resume, extend recovery, or end?",
+    "receiverRole": "both",
+    "duration": { "min": 240, "max": 240 },
+    "languageOptions": {
+      "anatomical": "Edge practice with pause",
+      "custom": true
+    },
+    "inclusion": "always",
+    "comfortChecks": ["resume", "extend_recovery", "finish"],
+    "multiPeakPhases": [
+      { "name": "BUILD", "durationSeconds": 120, "objective": "Notice arousal velocity" },
+      { "name": "PAUSE_RESET", "durationSeconds": 60, "objective": "Full relaxation", "pcMuscleCue": "RELEASE" },
+      { "name": "REASSESS", "durationSeconds": 60, "objective": "Choose next action" }
+    ]
+  },
+  {
+    "id": "multi-peak-04-recovery",
+    "type": "REWARD",
+    "intensity": 3,
+    "sensateLevel": 5,
+    "multiPeakType": "MULTI_PEAK_RECOVERY",
+    "name": "Multi-Peak Recovery",
+    "zoneTags": [],
+    "sensationTags": ["BREATH", "STILLNESS"],
+    "paceTags": ["SLOW", "STILLNESS"],
+    "text": "Stop stimulation. Let breathing and muscular tension settle. Notice sensation: comfortable, heightened, reduced, or uncomfortable? Choose: start another build, extend recovery 1-3 minutes, or finish. Remember: erection ≠ readiness, loss of erection ≠ anything wrong.",
+    "receiverRole": "both",
+    "duration": { "min": 120, "max": 300 },
+    "languageOptions": {
+      "anatomical": "Recovery & readiness check",
+      "custom": true
+    },
+    "inclusion": "always",
+    "comfortChecks": ["another_peak", "extend_recovery", "finish"],
+    "multiPeakPhases": [
+      { "name": "RECOVERY", "durationSeconds": 60, "objective": "Let arousal settle" },
+      { "name": "SENSATION_CHECK", "durationSeconds": 30, "objective": "Assess comfort" },
+      { "name": "CHOOSE", "durationSeconds": 30, "objective": "Next peak or finish" }
+    ]
+  },
+  {
+    "id": "multi-peak-05-choose-peak",
+    "type": "REWARD",
+    "intensity": 5,
+    "sensateLevel": 5,
+    "multiPeakType": "CHOOSE_YOUR_PEAK",
+    "name": "Choose Your Peak",
+    "zoneTags": [],
+    "sensationTags": ["USER_SELECTED"],
+    "paceTags": ["USER_PACED"],
+    "text": "Select your outcome: Explore another peak (resume if comfortable) | Allow orgasm & ejaculation (finish naturally) | Explore orgasm without ejaculation (optional, neither guaranteed) | Continue recovery (rest) | Finish (end session). Every option is valid. Stop if pain or significant discomfort.",
+    "receiverRole": "both",
+    "duration": { "min": 180, "max": 300 },
+    "languageOptions": {
+      "anatomical": "Outcome choice",
+      "custom": true
+    },
+    "inclusion": "always",
+    "comfortChecks": ["another_peak", "allow_ejaculation", "orgasm_no_ejaculation", "recovery", "finish"],
+    "multiPeakPhases": [
+      { "name": "CHOOSE_PEAK", "durationSeconds": 180, "objective": "User selects session outcome" }
+    ]
+  }
+]
