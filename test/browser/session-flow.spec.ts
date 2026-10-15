@@ -108,9 +108,17 @@ test('challenge progress remains anonymous, in-memory, and clears on reload', as
 
 test('session configuration and controls fit narrow phone and desktop widths', async ({ page }) => {
   await enterSolo(page)
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  const reviewButton = page.getByRole('button', { name: 'Review session' })
+  const transitionDuration = await reviewButton.evaluate((element) => {
+    const durations = getComputedStyle(element).transitionDuration.split(',').map((value) => Number.parseFloat(value))
+    return Math.max(...durations)
+  })
+  expect(transitionDuration).toBeLessThanOrEqual(0.00001)
+
   for (const width of [320, 390, 1280]) {
     await page.setViewportSize({ width, height: 900 })
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
-    await expect(page.getByRole('button', { name: 'Review session' })).toBeVisible()
+    await expect(reviewButton).toBeVisible()
   }
 })
