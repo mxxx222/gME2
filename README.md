@@ -46,6 +46,7 @@ npm run lint
 npm test
 npm run test:server
 npm run typecheck:server
+npm run test:browser
 npm run test:db
 npm run build
 ```
@@ -55,7 +56,8 @@ The production build is written to `dist/`. To preview it locally, run `npm run 
 ## Prototype boundaries
 
 - The repository-backed architecture assessment and implementation sequence are in [docs/architecture/backend-plan.md](docs/architecture/backend-plan.md). The local API/database foundation is implemented, but there is no account system, progress persistence, or production deployment.
-- The frontend game experience proposal and implementation status are in [docs/architecture/frontend-game-experience.md](docs/architecture/frontend-game-experience.md). The redesign is in progress.
+- The frontend game experience and current implementation status are in [docs/architecture/frontend-game-experience.md](docs/architecture/frontend-game-experience.md). The solo flow supports activity selection, configuration review, and an ephemeral timer session.
+- Current coding and privacy guidance is in [AGENTS.md](AGENTS.md). Superseded material from the remote prototype is clearly marked historical in [docs/archive/remote-prototype-2026-10](docs/archive/remote-prototype-2026-10/).
 - The 18+ check is a self-attestation, not identity or age verification.
 - The three 7-activity challenges (Intentional Moments, Better Conversations, and Everyday Appreciation) are frontend-only. Progress and optional categorical check-ins remain in page memory and reset when the page reloads or closes. There are no streaks, deadlines, or automatic reminders.
 - Solo sessions use the selected activity's existing fixed duration (2 or 5 minutes). Review the activity and timing before starting; adjustable duration bounds have not been defined. An in-progress session can be paused and returned to explicitly, and configuration changes do not alter its captured activity, prompt, or duration.
