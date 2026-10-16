@@ -221,6 +221,7 @@ export default function ChallengeHub({ hidden, onExit, onEnterSolo }: ChallengeH
   async function shareBadge() {
     if (!activeChallenge || !badgeDate) return
     setShareError('')
+    setNotice('')
     try {
       const file = await renderBadge(activeChallenge, badgeDate, template, showAttribution)
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
@@ -236,7 +237,10 @@ export default function ChallengeHub({ hidden, onExit, onEnterSolo }: ChallengeH
       window.setTimeout(() => URL.revokeObjectURL(url), 1000)
       setNotice('Badge image downloaded. Choose where to share it yourself.')
     } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') return
+      if (error instanceof Error && error.name === 'AbortError') {
+        setNotice('Sharing cancelled. Your badge is still available.')
+        return
+      }
       setShareError(error instanceof Error ? error.message : 'The badge image could not be shared.')
     }
   }
